@@ -1,0 +1,28 @@
+{
+  "name": "baazar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "local": "npx hardhat run --network localhost scripts/deploy.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.6",
+    "@nomiclabs/hardhat-ethers": "^2.1.1",
+    "@nomiclabs/hardhat-etherscan": "^3.1.0",
+    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts-upgradeable": "^4.7.3",
+    "@truffle/hdwallet-provider": "^2.0.14",
+    "hardhat": "^2.11.1",
+    "hardhat-abi-exporter": "^2.10.0",
+    "web3": "^1.8.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
+    "dotenv": "^16.0.2"
+  }
+}
