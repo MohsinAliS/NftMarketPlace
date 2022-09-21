@@ -7,13 +7,6 @@ const GOERLI_PRIVATE_KEY = process.env.GOERLI_PRIVATE_KEY;
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
 module.exports = {
-  solidity: "0.8.14",
-  networks: {
-    goerli: {
-      url: ALCHEMY_API_KEY,
-      accounts: [GOERLI_PRIVATE_KEY],
-    },
-  },
   solidity: {
     version: "0.8.14",
     settings: {
@@ -23,13 +16,19 @@ module.exports = {
       },
     },
   },
+  networks: {
+    goerli: {
+      url: ALCHEMY_API_KEY,
+      accounts: [GOERLI_PRIVATE_KEY],
+    },
+  },
 
   etherscan: {
     apiKey: process.env.etherscan_API,
   },
 
   abiExporter: {
-    path: "../NFTmarketplace/abi",
+    path: "../Frontend/abi",
     runOnCompile: true,
     clear: true,
     only: [
