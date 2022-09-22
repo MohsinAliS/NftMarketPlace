@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Eksell Display Large";
+    src: url(/assets/font/EksellDisplayWeb-Large.4740e7eb.woff2) format("woff2");
+  }
+
+  @font-face {
+    font-family: "Founders Grotesk Light";
+    src: url(/assets/font/FoundersGrotesk-Light.otf) format("otf");
+  }
+  @font-face {
+    font-family: "Founders Grotesk Regular";
+    src: url(/assets/font/FoundersGroteskWeb-Regular.1aff4b93.woff2)
+      format("woff2");
+  }
+
+  @font-face {
+    font-family: "Founders Grotesk Medium";
+    src: url(/assets/font/FoundersGroteskWeb-Medium.5890d7fb.woff2)
+      format("woff2");
+  }
+  @font-face {
+    font-family: "Founders Grotesk Bold";
+    src: url(/assets/font/FoundersGroteskWeb-Bold.847c466a.woff2)
+      format("woff2");
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+ul {
+  list-style: none;
+}
+
+.m-0 {
+  margin: 0 !important;
+}
+.ellipsis-v:after {
+  content: "\2807";
+  color: #2e2e2e;
+}
+a {
+  color: inherit !important;
+  text-decoration: inherit !important;
+}

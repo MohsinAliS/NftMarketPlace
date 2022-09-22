@@ -1,0 +1,19 @@
+export const SuperMarketplace_addr =
+  "0x5979bbD4bB106e2A948BDB575E4A9682904B8A46";
+export const ApprovedTokenRegis_addr =
+  "0x84dF9031CFB688291438de453b92b120001Ba72c";
+export const SpaceOperatorRegis_addr =
+  "0xa34eAB6014e2Db73564190b08F297e611F33a133";
+export const RareBazaar_addr = "0x1d0Aca7BAd885ab0618EE2612A95EcC6b0a8b41d";
+export const SuperAuctionHouse_addr =
+  "0x795eE7910eC88a9Bc7820cEDb25f30cF5B251366";
+export const CERC20_addr = "0xFB9C1AFb30E1240EA04Ab4BAE91D326d41b41149";
+export const NFTContracts_addr = "0xf92714A5EB344C29805dA8d5058faca54A5Ad894";
+
+// SuperRareMarketplace 0x5979bbD4bB106e2A948BDB575E4A9682904B8A46
+// ApprovedTokenRegistry 0x84dF9031CFB688291438de453b92b120001Ba72c
+// SpaceOperatorRegistry 0xa34eAB6014e2Db73564190b08F297e611F33a133
+// SuperRareBazaar 0x1d0Aca7BAd885ab0618EE2612A95EcC6b0a8b41d
+// SuperRareAuctionHouse 0x795eE7910eC88a9Bc7820cEDb25f30cF5B251366
+// ERC20 Deploy Here  0xFB9C1AFb30E1240EA04Ab4BAE91D326d41b41149
+// NFTContract Deploy Here  0xF5402dbCcA1c5E5dbD0937aA7a24bA9a905dB878

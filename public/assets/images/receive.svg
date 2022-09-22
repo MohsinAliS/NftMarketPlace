@@ -1,0 +1,18 @@
+<svg
+                  width="64"
+                  height="64"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <rect
+                    x="0.5"
+                    y="0.5"
+                    width="63"
+                    height="63"
+                    rx="31.5"
+                    fill="white"
+                    stroke="black"></rect>
+                  <path
+                    d="M33 24V34.17L38.59 28.59L40 30L32.001 37.999L40 38V40H24V38L31.999 37.999L24 30L25.41 28.59L31 34.17V24H33Z"
+                    fill="black"></path>
+                </svg>
