@@ -99,8 +99,8 @@ const MarketPlace: NextPage = () => {
               className="flex flex-col overflow-hidden mb-10 sm:mb-5"
             >
               <Link
-                href="/market-place/[id]"
-                as={`/market-place/${marketNftItem.token_id}`}
+                href="/nft-item"
+                // as={`/market-place/${marketNftItem.token_id}`}
               >
                 <a>
                   <NftItem item={marketNftItem} />
