@@ -56,33 +56,38 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
             <div className="flex-1 ">
               <div className="block mt-1 ">
                 <p className="text-xl font-semibold text-gray-900">
-                  <Link href={{ pathname: "/nft-item", query: item }}>
-                    {item?.name}
-                  </Link>
+                  {/* <Link href={{ pathname: "/nft-item", query: item }}> */}
+                  {item?.name}
+                  {/* </Link> */}
                   {item.collected && (
                     <div className="relative">
                       <button
                         className="p-1 ellipsis-v float-right hover:bg-gray-100"
-                        onClick={controlMenuHandler}></button>
+                        onClick={controlMenuHandler}
+                      ></button>
 
                       {showControlMenu && (
                         <ul
-                          className={`rounded-lg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full  ${styles.controlMenu}`}>
+                          className={`rounded-lg absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-full  ${styles.controlMenu}`}
+                        >
                           <a onClick={() => setShowSetListPrice(true)}>
                             <li
-                              className={`w-full hover:cursor-pointer hover:bg-gray-100 p-1 hover:rounded py-2`}>
+                              className={`w-full hover:cursor-pointer hover:bg-gray-100 p-1 hover:rounded py-2`}
+                            >
                               Set a list price
                             </li>
                           </a>
                           <a onClick={() => setShowStartAuction(true)}>
                             <li
-                              className={`w-full hover:cursor-pointer hover:bg-gray-100 p-1 hover:rounded py-2`}>
+                              className={`w-full hover:cursor-pointer hover:bg-gray-100 p-1 hover:rounded py-2`}
+                            >
                               Start an auction
                             </li>
                           </a>
                           <a>
                             <li
-                              className={`w-full hover:cursor-pointer hover:bg-gray-100 p-1 hover:rounded py-2`}>
+                              className={`w-full hover:cursor-pointer hover:bg-gray-100 p-1 hover:rounded py-2`}
+                            >
                               Transfer
                             </li>
                           </a>
@@ -132,7 +137,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
         <div
           id="defaultModal"
           aria-hidden="true"
-          className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full justify-center items-center bg-gray-600 bg-opacity-50">
+          className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full justify-center items-center bg-gray-600 bg-opacity-50"
+        >
           <div className="relative p-4 w-full max-w-4xl h-full md:h-auto mx-auto ">
             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 bg-gradient-to-t from-gray-100 ">
               <div className="flex justify-between items-start p-4 rounded-t mb-5">
@@ -143,17 +149,20 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                   type="button"
                   className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
                   data-modal-toggle="defaultModal"
-                  onClick={() => setShowStartAuction(false)}>
+                  onClick={() => setShowStartAuction(false)}
+                >
                   <svg
                     aria-hidden="true"
                     className="w-5 h-5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"></path>
+                      clipRule="evenodd"
+                    ></path>
                   </svg>
                   <span className="sr-only">Close modal</span>
                 </button>
@@ -176,7 +185,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                           cTab === 0
                             ? " border-b-2 border-black text-black"
                             : ""
-                        }`}>
+                        }`}
+                      >
                         <h3 className="pb-1">RESERVE</h3>
                       </Tab>
                       <Tab
@@ -185,7 +195,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                           cTab === 1
                             ? " border-b-2 border-black text-black"
                             : ""
-                        }`}>
+                        }`}
+                      >
                         <h3 className="pb-1">SCHEDULED</h3>
                       </Tab>
                     </Tab.List>
@@ -195,7 +206,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                         <div className="mx-auto mt-6 mb-6">
                           <form
                             className="space-y-6 text-sm"
-                            onSubmit={setStartAuctionHandler}>
+                            onSubmit={setStartAuctionHandler}
+                          >
                             <div className="relative">
                               <input
                                 type="number"
@@ -233,7 +245,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                                       viewBox="0 0 24 24"
                                       strokeWidth={1.5}
                                       stroke="currentColor"
-                                      className="w-6 h-6">
+                                      className="w-6 h-6"
+                                    >
                                       <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
@@ -248,12 +261,14 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                               <button
                                 type="button"
                                 onClick={() => setShowStartAuction(false)}
-                                className="hover:bg-black hover:shadow-lg hover:text-white focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase ">
+                                className="hover:bg-black hover:shadow-lg hover:text-white focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase "
+                              >
                                 Nevermind
                               </button>
                               <button
                                 type="submit"
-                                className="ml-auto text-white bg-black hover:shadow-lg focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase ">
+                                className="ml-auto text-white bg-black hover:shadow-lg focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase "
+                              >
                                 Set Reserve
                               </button>
                             </div>
@@ -264,7 +279,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                         <div className="mx-auto mt-6 mb-6">
                           <form
                             className="space-y-6 text-sm"
-                            onSubmit={setScheduleAuctionHandler}>
+                            onSubmit={setScheduleAuctionHandler}
+                          >
                             <div className="sm:grid sm:grid-cols-2 gap-1">
                               <div>
                                 <label htmlFor="startDate" className="pl-2.5">
@@ -367,12 +383,14 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                               <button
                                 type="button"
                                 onClick={() => setShowStartAuction(false)}
-                                className="hover:bg-black hover:shadow-lg hover:text-white focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase ">
+                                className="hover:bg-black hover:shadow-lg hover:text-white focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase "
+                              >
                                 Nevermind
                               </button>
                               <button
                                 type="submit"
-                                className="ml-auto text-white bg-black hover:shadow-lg focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase ">
+                                className="ml-auto text-white bg-black hover:shadow-lg focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase "
+                              >
                                 Schedule
                               </button>
                             </div>
@@ -392,7 +410,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
         <div
           id="defaultModal"
           aria-hidden="true"
-          className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full justify-center items-center bg-gray-600 bg-opacity-50">
+          className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full justify-center items-center bg-gray-600 bg-opacity-50"
+        >
           <div className="relative p-4 w-full max-w-4xl h-full md:h-auto mx-auto ">
             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 bg-gradient-to-t from-gray-100 ">
               <div className="flex justify-between items-start p-4 rounded-t mb-5">
@@ -403,17 +422,20 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                   type="button"
                   className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
                   data-modal-toggle="defaultModal"
-                  onClick={() => setShowSetListPrice(false)}>
+                  onClick={() => setShowSetListPrice(false)}
+                >
                   <svg
                     aria-hidden="true"
                     className="w-5 h-5"
                     fill="currentColor"
                     viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"></path>
+                      clipRule="evenodd"
+                    ></path>
                   </svg>
                   <span className="sr-only">Close modal</span>
                 </button>
@@ -431,7 +453,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                   <div className="mx-auto mt-6 mb-6">
                     <form
                       className="space-y-6 text-sm"
-                      onSubmit={setStartAuctionHandler}>
+                      onSubmit={setStartAuctionHandler}
+                    >
                       <div className="relative">
                         <input
                           type="number"
@@ -457,12 +480,14 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                         <button
                           type="button"
                           onClick={() => setShowSetListPrice(false)}
-                          className="hover:bg-black hover:shadow-lg hover:text-white focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase ">
+                          className="hover:bg-black hover:shadow-lg hover:text-white focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase "
+                        >
                           Nevermind
                         </button>
                         <button
                           type="submit"
-                          className="ml-auto text-white bg-black hover:shadow-lg focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase ">
+                          className="ml-auto text-white bg-black hover:shadow-lg focus:ring-2 focus:outline-none font-medium rounded text-sm px-10 py-2.5 text-center uppercase "
+                        >
                           Set List Price
                         </button>
                       </div>

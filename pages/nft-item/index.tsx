@@ -10,12 +10,16 @@ import Web3Modal, { providers } from "web3modal";
 import { Fragment, useEffect, useState } from "react";
 import { FunctionComponent } from "react";
 import auctionAbi from "../../abi/NFTContract.json";
-import supareRareBazar from "../../abi/SuperRareBazaar.json";
-import {
-  CERC20_addr,
-  SuperMarketplace_addr,
-  RareBazaar_addr,
-} from "../../abi/addresses";
+// import supareRareBazar from "../../abi/SuperRareBazaar.json";
+import marketPlaceAbi from "../../contract-abi/marketplace.json";
+import NFTcontractAbi from "../../contract-abi/NFTContract.json";
+// import {
+//   CERC20_addr,
+//   SuperMarketplace_addr,
+//   RareBazaar_addr,
+// } from "../../abi/addresses";
+import { ERC20, marketPlace, NFTContract } from "../../contract-abi/addresses";
+
 // import {AuctionsBazaar_addr} from '../../abi/addresses'
 import { NftItemData as item } from "../../content/nft-item";
 import { withRouter } from "next/router";
@@ -61,6 +65,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
 
   const [walletAddress, setWalletAddress] = useState("");
   const [ownerAddress, setOwnerAddress] = useState("");
+  const [marketOwnerAddress, setMarketOwnerAddress] = useState("");
   const [ownerMatch, setMatch] = useState(false);
   const [price, setPrice] = useState([]);
 
@@ -79,7 +84,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
         "************************(((((("
       );
 
-      let contract = new ethers.Contract(nft.address, auctionAbi, signer);
+      let contract = new ethers.Contract(NFTContract, NFTcontractAbi, signer);
       let owner = await contract.ownerOf(nft.token_id);
       // let setSellPrice = await contract()
       setOwnerAddress(owner);
@@ -98,57 +103,151 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       console.log("Error Occurred while checking owner", error);
     }
   };
-  const setSellandGet = async () => {
-    await setSellPrice();
+
+  const marketOwnerCheck = async (account) => {
+    try {
+      let signer = await loadProvider();
+      console.log("account", account);
+      let wallet_Address = ethers.utils.getAddress(account);
+
+      let contract = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
+      let owner = await contract.ownerOf(NFTContract, nft.token_id);
+      // let setSellPrice = await contract()
+      setMarketOwnerAddress(owner);
+      // console.log("owner", ownerAddress);
+      // console.log("wallet", walletAddress);
+      // console.log({ ownerAddress, walletAddress }, "*****************");
+      // if (ownerAddress == walletAddress) {
+      //   setMatch(!ownerMatch);
+      // }
+      // if (owner === wallet_Address) {
+      //   setMatch(true);
+      // }
+      console.log("market owner match", ownerMatch);
+    } catch (error) {
+      console.log("Error Occurred while checking owner", error);
+    }
   };
 
-  const setSellPrice = async () => {
+  const setSellandGet = async () => {
+    // await setSellPrice();
+    await createMarketItem();
+  };
+
+  // const setSellPrice = async () => {
+  //   try {
+  //     let signer = await loadProvider();
+  //     let contract = new ethers.Contract(
+  //       // RareBazaar_addr,
+  //       // supareRareBazar,
+  //       marketPlace,
+  //       marketPlaceAbi,
+  //       signer
+  //     );
+  //     let sellNow = await contract.setSalePrice(
+  //       nft.address,
+  //       nft.token_id,
+  //       // CERC20_addr,
+  //       ERC20,
+  //       10000
+  //       // SuperMarketplace_addr,
+  //       // marketPlace,
+  //       // [walletAddress],
+  //       // [100]
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
+  const createMarketItem = async () => {
     try {
       let signer = await loadProvider();
       let contract = new ethers.Contract(
-        RareBazaar_addr,
-        supareRareBazar,
+        // RareBazaar_addr,
+        // supareRareBazar,
+        marketPlace,
+        marketPlaceAbi,
         signer
       );
-      let sellNow = await contract.setSalePrice(
-        nft.address,
-        nft.token_id,
-        CERC20_addr,
-        10000,
-        SuperMarketplace_addr,
-        [walletAddress],
-        [100]
+      let sellNow = await contract.createMarketItem(
+        // nft.address,
+        NFTContract,
+        1,
+        // nft.token_id,
+        // CERC20_addr,
+        ERC20,
+        10000
+        // SuperMarketplace_addr,
+        // marketPlace,
+        // [walletAddress],
+        // [100]
       );
     } catch (error) {
       console.log(error);
     }
   };
 
-  const getPrice = async () => {
-    let signer = await loadProvider();
-    let contract = new ethers.Contract(
-      RareBazaar_addr,
-      supareRareBazar,
-      signer
-    );
+  const BuyNft = async () => {
     try {
-      let getPrice = await contract.getSalePrice(
-        nft.address,
-        nft.token_id,
-        SuperMarketplace_addr
+      let signer = await loadProvider();
+      let contract = new ethers.Contract(
+        // RareBazaar_addr,
+        // supareRareBazar,
+        marketPlace,
+        marketPlaceAbi,
+        signer
       );
-      let price = await ethers.utils.formatUnits(getPrice[2]["_hex"], "gwei");
-      if (price == "0.0") {
-        await setPrice([]);
-      } else {
-        await setPrice(price);
-      }
-      console.log("setPrice values :", getPrice[2]["_hex"]);
-      console.log("After setPrice Get values :", getPrice);
+      console.log("new account", signer);
+      let sellNow = await contract.transferNFT(
+        // nft.address,
+        NFTContract,
+        marketPlace,
+        account,
+        0,
+        10000
+        // nft.token_id,
+        // CERC20_addr,
+        // ERC20,
+
+        // SuperMarketplace_addr,
+        // marketPlace,
+        // [walletAddress],
+        // [100]
+      );
     } catch (error) {
       console.log(error);
     }
   };
+
+  // const getPrice = async () => {
+  //   let signer = await loadProvider();
+  //   let contract = new ethers.Contract(
+  //     // RareBazaar_addr,
+  //     marketPlace,
+  //     // supareRareBazar,
+  //     marketPlaceAbi,
+  //     signer
+  //   );
+  //   try {
+  //     let getPrice = await contract.getSalePrice(
+  //       nft.address,
+  //       nft.token_id,
+  //       // SuperMarketplace_addr,
+  //       marketPlace
+  //     );
+  //     let price = await ethers.utils.formatUnits(getPrice[2]["_hex"], "gwei");
+  //     if (price == "0.0") {
+  //       await setPrice([]);
+  //     } else {
+  //       await setPrice(price);
+  //     }
+  //     console.log("setPrice values :", getPrice[2]["_hex"]);
+  //     console.log("After setPrice Get values :", getPrice);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   useEffect(() => {
     setNft(props.router.query);
@@ -156,7 +255,8 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       // console.log({ ac: nft.address, account }, "***************");
       (async () => {
         await ownerCheck(account);
-        await getPrice();
+        await marketOwnerCheck(account);
+        // await getPrice();
       })();
     }
   }, [account, nft.address]);
@@ -251,14 +351,17 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                       <button
                         className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
                         // onClick={setModalIsOpen(!modalIsOpen)}
-                        // onClick={() => setModalFormOpen(true)}
+                        onClick={() => setModalFormOpen(true)}
                         // onClick={setSellPrice}
-                        onClick={setSellandGet}
+                        // onClick={setSellandGet}
                       >
-                        Sell Nft
+                        Set Sell Price
                       </button>
                     ) : (
-                      <button className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300">
+                      <button
+                        className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
+                        onClick={BuyNft}
+                      >
                         Buy Nft
                       </button>
                     )}
@@ -419,6 +522,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           open={modalFormOpen}
           close={() => setModalFormOpen(false)}
           address={nft}
+          createMarketItemFunc={createMarketItem}
         />
         {/* <Modal modalopen={modalIsOpen} /> */}
       </div>

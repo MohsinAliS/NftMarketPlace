@@ -20,7 +20,7 @@ const createBackendServer = (baseURL) => {
     );
 
   const getNfts = (
-    asset_contract_addresses = "0xf92714A5EB344C29805dA8d5058faca54A5Ad894",
+    asset_contract_addresses = "0x3fdc19e2ec0bfbc80ed227716faef783ef19000a",
     order_direction = "desc",
     include_orders = "false"
   ) =>

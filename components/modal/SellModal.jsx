@@ -15,10 +15,11 @@ import {
   Row,
   Col,
 } from "reactstrap";
-const SellModal = ({ open, close, address }) => {
+const SellModal = ({ open, close, address, createMarketItemFunc }) => {
   const [amount, setAmount] = useState("");
   console.log("sellmodal", open);
   console.log("address", address);
+
   return (
     <>
       <Row>
@@ -63,7 +64,12 @@ const SellModal = ({ open, close, address }) => {
                       </label>
                     </div> */}
                     <div className=" text-center">
-                      <Button className=" my-4" color="primary" type="button">
+                      <Button
+                        className=" my-4"
+                        color="primary"
+                        type="button"
+                        onClick={createMarketItemFunc}
+                      >
                         Sell Now
                       </Button>
                     </div>
