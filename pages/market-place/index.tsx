@@ -5,9 +5,9 @@ import { useWeb3React } from "@web3-react/core";
 import type { NextPage } from "next";
 import { Fragment, useState, useEffect } from "react";
 import apis from "../../services/index";
-import NftItem from "../../components/nft-item";
+import NftItem from "../../components/nft-item-common"
 import Link from "next/link";
-import { nfts } from "../../content/meta";
+// import { nfts } from "../../content/meta";
 
 const MarketPlace: NextPage = () => {
   const [cTab, setCTab] = useState(0);
@@ -93,21 +93,21 @@ const MarketPlace: NextPage = () => {
             token_id,
           };
 
-          return (
+          return  (
             <div
               key={idx}
               className="flex flex-col overflow-hidden mb-10 sm:mb-5"
             >
-              <Link
-                href="/nft-item"
-                // as={`/market-place/${marketNftItem.token_id}`}
-              >
-                <a>
-                  <NftItem item={marketNftItem} />
-                </a>
-              </Link>
-            </div>
-          );
+              {/* <Link
+                href={{ pathname: "/nft-item", query: marketNftItem}}
+                as={`/market-place/${marketNftItem.token_id}`}
+              > */}
+                
+                 <NftItem item={marketNftItem} />
+                
+              {/* </Link> */}
+             </div>
+          )
         })}
       </div>
     </Fragment>

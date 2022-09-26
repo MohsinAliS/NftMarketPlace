@@ -1,9 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
+import { useRouter, } from "next/router";
 
 import { Tab } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, FunctionComponent, useState } from "react";
 import styles from "../../styles/Home.module.css";
+ 
 type NftItemProps = {
   item: any;
 };
@@ -24,7 +26,9 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
 
   const [cTab, setCTab] = useState(0);
   const today = new Date().toISOString().split("T")[0];
-
+ const router = useRouter();
+  const routerdata = router.asPath;
+  console.log(routerdata);
   const controlMenuHandler = (e) => {
     e.stopPropagation();
     setShowControlMenu(!showControlMenu);
@@ -43,7 +47,7 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
       <a onClick={() => setShowControlMenu(false)}>
         <div className="max-w-xs border-slate-100 border-2 mx-auto">
           <div className="flex-shrink-0 hover:cursor-pointer ">
-            <Link href={{ pathname: "/nft-item", query: item }}>
+            <Link href={{ pathname: "/nft-item", query:item }}  as={`${routerdata}/nft-item/${item.token_id}`} >
               <img
                 className={`h-80 w-full object-cover`}
                 src={item?.coverImage}

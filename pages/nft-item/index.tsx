@@ -75,14 +75,14 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       console.log("account", account);
       let wallet_Address = ethers.utils.getAddress(account);
 
-      console.log(
-        {
-          address: nft.address,
-          auctionAbi,
-          signer,
-        },
-        "************************(((((("
-      );
+      // console.log(
+      //   {
+      //     address: nft.address,
+      //     auctionAbi,
+      //     signer,
+      //   },
+      //   "************************(((((("
+      // );
 
       let contract = new ethers.Contract(NFTContract, NFTcontractAbi, signer);
       let owner = await contract.ownerOf(nft.token_id);
@@ -255,7 +255,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       // console.log({ ac: nft.address, account }, "***************");
       (async () => {
         await ownerCheck(account);
-        await marketOwnerCheck(account);
+        // await marketOwnerCheck(account);
         // await getPrice();
       })();
     }
