@@ -11,36 +11,37 @@ type NftItemProps = {
   item: any;
 };
 
-export async function getStaticProps(context) {
-  console.log(context, "**************"); // return { movieId: 'Mortal Kombat' }
-  return {
-    props: {
-      data: context.query,
-    }, // will be passed to the page component as props
-  };
-}
+// export async function getStaticProps(context) {
+//   console.log(context, "**************"); // return { movieId: 'Mortal Kombat' }
+//   return {
+//     props: {
+//       data: context.query,
+//     }, // will be passed to the page component as props
+//   };
+//   console.log("context", context);
+// }
 
-const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
+const NftItem: FunctionComponent<NftItemProps> = ({
+  item,
+  // open,
+  // close,
+  // createMarketItemFunc,
+  // setSalePrice,
+}) => {
   const [showControlMenu, setShowControlMenu] = useState(false);
   const [showStartAuction, setShowStartAuction] = useState(false);
   const [showSetListPrice, setShowSetListPrice] = useState(false);
+  // const [inputprice, setinPutSalePrice] = useState("");
 
-  const [cTab, setCTab] = useState(0);
+  // const [cTab, setCTab] = useState(0);
   const today = new Date().toISOString().split("T")[0];
   const router = useRouter();
   const routerdata = router.asPath;
   console.log(routerdata);
+
   const controlMenuHandler = (e) => {
     e.stopPropagation();
     setShowControlMenu(!showControlMenu);
-  };
-  const setStartAuctionHandler = (e) => {
-    e.preventDefault();
-    console.log("hi");
-  };
-  const setScheduleAuctionHandler = (e) => {
-    e.preventDefault();
-    console.log("hi");
   };
 
   return (
@@ -50,7 +51,7 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
           <div className="flex-shrink-0 hover:cursor-pointer ">
             <Link
               href={{ pathname: "/nft-item", query: item }}
-              as={`${routerdata}/nft-item/${item.token_id}`}
+              as={`${routerdata}/${item.address}/${item.token_id}`}
             >
               <img
                 className={`h-80 w-full object-cover`}
@@ -154,7 +155,7 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
         </div>
       </a>
 
-      {showStartAuction && (
+      {/* {showStartAuction && (
         <div
           id="defaultModal"
           aria-hidden="true"
@@ -472,17 +473,17 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                 </div>
                 <div className="col-span-7">
                   <div className="mx-auto mt-6 mb-6">
-                    <form
-                      className="space-y-6 text-sm"
-                      onSubmit={setStartAuctionHandler}
-                    >
+                    <form className="space-y-6 text-sm" onSubmit={handleSale}>
                       <div className="relative">
                         <input
-                          type="number"
+                          type="text"
                           name="listPrice"
                           id="listPrice"
                           className=" block w-full p-2.5 focus:outline-none border-b-2 bg-transparent"
                           placeholder="List Price"
+                          onChange={(e) => {
+                            setinPutSalePrice(e.target.value);
+                          }}
                           required
                         />
                         <label className="absolute right-0 top-2 font-medium">
@@ -519,7 +520,7 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </Fragment>
   );
 };

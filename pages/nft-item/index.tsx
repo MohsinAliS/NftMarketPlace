@@ -47,6 +47,8 @@ type nftTypes = {
   isAuction: boolean;
   token_id: string;
   schema_name: string;
+  creator_img: string;
+  owner_img: string;
 };
 interface Provider {
   connected: boolean;
@@ -62,6 +64,8 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
     isAuction: true,
     token_id: "",
     schema_name: "",
+    creator_img: "",
+    owner_img: "",
   });
 
   console.log("nft", nft);
@@ -251,8 +255,11 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   };
 
   const createMarketItem = async () => {
+    console.log(typeof Inputprice);
+    console.log(Inputprice);
     try {
       let approve = await approval();
+      console.log("createMarketItem");
       if (approve) {
         let signer = await loadProvider();
         let contract = new ethers.Contract(
@@ -266,7 +273,6 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           // nft.address,
           nft.address,
           nft.token_id,
-
           ethers.utils.parseEther(Inputprice.toString()),
           false,
           120,
@@ -283,6 +289,41 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+  const createMarketItemWithPlaceBid = async (inputTime) => {
+    if (inputTime === 0) {
+      return;
+    } else {
+      let timeInSec = inputTime * 60;
+      console.log("time in Sec", timeInSec);
+      try {
+        let approve = await approval();
+
+        if (approve) {
+          let signer = await loadProvider();
+          let contract = new ethers.Contract(
+            // RareBazaar_addr,
+            // supareRareBazar,
+            marketPlace,
+            marketPlaceAbi,
+            signer
+          );
+          let sellNow = await contract.createMarketItem(
+            // nft.address,
+            nft.address,
+            nft.token_id,
+            ethers.utils.parseEther(Inputprice),
+            true,
+            timeInSec,
+
+            10
+          );
+          console.log(sellNow);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -381,7 +422,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                   <div className="flex space-x-2 mt-1">
                     <div>
                       <img
-                        src="../assets/images/thunderdome.png"
+                        src={nft.creator_img}
                         alt=""
                         className="rounded-2xl w-12 h-12 "
                       />
@@ -396,7 +437,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                   <div className="flex space-x-2 mt-1">
                     <div>
                       <img
-                        src="../assets/images/thunderdome.png"
+                        src={nft.owner_img}
                         alt=""
                         className="rounded-2xl w-12 h-12 "
                       />
@@ -438,7 +479,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                       <button
                         className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
                         // onClick={setModalIsOpen(!modalIsOpen)}
-                        onClick={() => setModalFormOpen(true)}
+                        // onClick={() => setModalFormOpen(true)}
                         // onClick={setSellPrice}
                         // onClick={setSellandGet}
                       >
@@ -448,11 +489,12 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                       <button
                         className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
                         // onClick={setModalIsOpen(!modalIsOpen)}
+                        // onClick={() => setModalFormOpen(true)}
                         onClick={() => setModalFormOpen(true)}
                         // onClick={setSellPrice}
                         // onClick={setSellandGet}
                       >
-                        Set Sell Price
+                        Sell
                       </button>
                     ) : (
                       <button
@@ -553,7 +595,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                   rel="noreferrer"
                   className="text-right lg:text-left"
                 >
-                  <p className="w-32">0x22...552a</p>
+                  <p className="mx-2 w-32">{nft.address}</p>
                 </a>
               </div>
               <div className="grid grid-cols-2 gap-1">
@@ -566,7 +608,9 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                 <p className="SuperRareText-sc-9920pw-0 fTQoOh">
                   Token Standard
                 </p>
-                <p className="SuperRareText-sc-9920pw-0 hNBiA-D">ERC-721</p>
+                <p className="SuperRareText-sc-9920pw-0 hNBiA-D">
+                  {nft.schema_name}
+                </p>
               </div>
               <div className="grid grid-cols-2 gap-1">
                 <p className="SuperRareText-sc-9920pw-0 fTQoOh">File Size</p>
@@ -620,7 +664,9 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           close={() => setModalFormOpen(false)}
           address={nft}
           createMarketItemFunc={createMarketItem}
+          createMarketItemFuncWithPlaceBid={createMarketItemWithPlaceBid}
           setSalePrice={setSalePrice}
+          item={nft}
         />
         {/* <Modal modalopen={modalIsOpen} /> */}
       </div>

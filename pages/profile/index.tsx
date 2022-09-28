@@ -116,8 +116,15 @@ const Profile: NextPage = () => {
                         description,
 
                         token_id,
-                        creator: { address: creatorAddress },
-                        owner: { address: ownerAddress },
+                        creator: {
+                          address: creatorAddress,
+                          profile_img_url: creator_img,
+                        },
+
+                        owner: {
+                          address: ownerAddress,
+                          profile_img_url: owner_img,
+                        },
                         asset_contract: { address },
                         asset_contract: { schema_name },
                       } = collection;
@@ -125,6 +132,8 @@ const Profile: NextPage = () => {
                         coverImage: image_url,
                         name,
                         description,
+                        creator_img,
+                        owner_img,
                         schema_name,
                         address,
                         token_id,
