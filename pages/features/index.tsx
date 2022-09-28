@@ -2,7 +2,7 @@
 import { Tab } from "@headlessui/react";
 import type { NextPage } from "next";
 import { Fragment, useState } from "react";
-import NftItem from "../../components/nft-item";
+// import NftItem from "../../components/nft-item";
 // import { NftMeta } from "../../types/nft";
 import { exhibitions } from "../../content/exhibitions";
 

@@ -1,11 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 import { Tab } from "@headlessui/react";
 import { NftMeta } from "@_types/nft";
-import { useWeb3React } from "@web3-react/core";
+import { Contract, ethers } from "ethers";
 import type { NextPage } from "next";
+import marketPlaceAbi from "../../contract-abi/marketplace.json";
+import { ERC20, marketPlace, NFTContract } from "../../contract-abi/addresses";
+import { useWeb3React } from "@web3-react/core";
 import { Fragment, useState, useEffect } from "react";
+import loadProvider from "../../utils/loadProvider";
 import apis from "../../services/index";
-import NftItem from "../../components/nft-item-common"
+import NftItem from "../../components/nft-item-common";
 import Link from "next/link";
 // import { nfts } from "../../content/meta";
 
@@ -18,16 +22,53 @@ const MarketPlace: NextPage = () => {
   ];
   const [assets, setAssets] = useState([]);
   const [loader, setLoader] = useState(false);
-  const { account } = useWeb3React();
+
+  const { connector, library, account, chainId, activate, deactivate, active } =
+    useWeb3React();
+  const fetchMarket = async () => {
+    let signer = await loadProvider();
+    let contract = new ethers.Contract(
+      // RareBazaar_addr,
+      // supareRareBazar,
+      marketPlace,
+      marketPlaceAbi,
+      signer
+    );
+    setLoader(true);
+    let response = await apis.getProfileAssets(marketPlace);
+    // let response = await contract.fetchMarketItems();
+    // let nftAddress = response[1][1];
+    setAssets(response.data.assets);
+    //  console.log(response.data.assets);
+    console.log("response", response);
+  };
+
+  // const getURI = async (nftAddress, type) => {
+  //   let signer = await loadProvider();
+  //   let contract = new ethers.Contract(
+  //     // RareBazaar_addr,
+  //     // supareRareBazar,
+  //     marketPlace,
+  //     marketPlaceAbi,
+  //     signer
+  //   );
+  //   try {
+  //     if (type === 0) {
+  //       return await
+  //     } else {
+
+  //     }
+  //   } catch (error) {
+  //     console.log("getURI", error);
+  //   }
+  // };
   useEffect(() => {
     console.log(account, "################");
     if (account) {
       (async () => {
         try {
-          setLoader(true);
-          let response = await apis.getNfts();
-          setAssets(response.data.assets);
-          console.log(response.data.assets);
+          fetchMarket();
+          // let sellNow = await contract.transferNFT(
         } catch (e) {
           console.log(e);
         }
@@ -76,11 +117,11 @@ const MarketPlace: NextPage = () => {
             image_url,
             name,
             description,
-            schema_name,
             token_id,
             creator: { address: creatorAddress },
             owner: { address: ownerAddress },
             asset_contract: { address },
+            asset_contract: { schema_name },
           } = nft;
           const marketNftItem = {
             coverImage: image_url,
@@ -93,7 +134,7 @@ const MarketPlace: NextPage = () => {
             token_id,
           };
 
-          return  (
+          return (
             <div
               key={idx}
               className="flex flex-col overflow-hidden mb-10 sm:mb-5"
@@ -102,12 +143,12 @@ const MarketPlace: NextPage = () => {
                 href={{ pathname: "/nft-item", query: marketNftItem}}
                 as={`/market-place/${marketNftItem.token_id}`}
               > */}
-                
-                 <NftItem item={marketNftItem} />
-                
+
+              <NftItem item={marketNftItem} />
+
               {/* </Link> */}
-             </div>
-          )
+            </div>
+          );
         })}
       </div>
     </Fragment>

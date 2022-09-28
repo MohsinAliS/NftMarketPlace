@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+/* eslint no-use-before-define: 0 */ // --> OFF
 import type { NextPage } from "next";
 import { Fragment } from "react";
 import FeaturedItems from "../components/featured-items/FeaturedItems";

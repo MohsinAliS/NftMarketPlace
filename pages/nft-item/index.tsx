@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
+/* eslint no-use-before-define: 0 */ // --> OFF
 import { Tab } from "@headlessui/react";
 import loadProvider from "../../utils/loadProvider";
 import { useWeb3React } from "@web3-react/core";
@@ -9,10 +10,13 @@ import { NftMeta } from "@_types/nft";
 import Web3Modal, { providers } from "web3modal";
 import { Fragment, useEffect, useState } from "react";
 import { FunctionComponent } from "react";
+
 import auctionAbi from "../../abi/NFTContract.json";
 // import supareRareBazar from "../../abi/SuperRareBazaar.json";
 import marketPlaceAbi from "../../contract-abi/marketplace.json";
 import NFTcontractAbi from "../../contract-abi/NFTContract.json";
+import IERC721 from "../../contract-abi/IERC721.json";
+import IERC1155 from "../../contract-abi/IERC1155.json";
 // import {
 //   CERC20_addr,
 //   SuperMarketplace_addr,
@@ -42,6 +46,7 @@ type nftTypes = {
   address: string;
   isAuction: boolean;
   token_id: string;
+  schema_name: string;
 };
 interface Provider {
   connected: boolean;
@@ -56,8 +61,10 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
     address: "",
     isAuction: true,
     token_id: "",
+    schema_name: "",
   });
-  console.log("props", props);
+
+  console.log("nft", nft);
   const [modalFormOpen, setModalFormOpen] = useState(false);
   console.log("modal", modalFormOpen);
   const { connector, library, account, chainId, activate, deactivate, active } =
@@ -67,36 +74,66 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   const [ownerAddress, setOwnerAddress] = useState("");
   const [marketOwnerAddress, setMarketOwnerAddress] = useState("");
   const [ownerMatch, setMatch] = useState(false);
-  const [price, setPrice] = useState([]);
+  const [marketOwnerAddressMatch, setMarketOwnerAddressMatch] = useState(false);
+  const [price, setPrice] = useState("");
+  const [Inputprice, setInputPrice] = useState("");
+
+  const setSalePrice = (inputprice) => {
+    setInputPrice(inputprice);
+  };
 
   const ownerCheck = async (account) => {
     try {
       let signer = await loadProvider();
       console.log("account", account);
       let wallet_Address = ethers.utils.getAddress(account);
+      let owner = "";
+      console.log("sadkjasbgdjasgjkas     1", nft.schema_name, "ss");
+      if (nft?.schema_name == "ERC721") {
+        let contract721 = new ethers.Contract(nft.address, IERC721, signer);
+        console.log("sadkjasbgdjasgjkas     2", owner);
+        owner = await contract721.ownerOf(nft.token_id);
+        console.log("sadkjasbgdjasgjkas", owner);
+      } else {
+        let contract1155 = new ethers.Contract(nft.address, IERC1155, signer);
+        let balance = await contract1155.balanceOf(nft.address, nft.token_id);
+        if (Number(balance.toString()) > 0) {
+          owner = account;
+        } else {
+          owner = account;
+        }
 
-      // console.log(
-      //   {
-      //     address: nft.address,
-      //     auctionAbi,
-      //     signer,
-      //   },
-      //   "************************(((((("
-      // );
+        console.log("sadkjasbgdjasgjkas", balance, balance.toString(), owner);
+      }
 
-      let contract = new ethers.Contract(NFTContract, NFTcontractAbi, signer);
-      let owner = await contract.ownerOf(nft.token_id);
+      // // console.log(
+      // //   {
+      // //     address: nft.address,
+      // //     auctionAbi,
+      // //     signer,
+      // //   },
+      // //   "************************(((((("
+      // // );
+
+      // // let contract = new ethers.Contract(NFTContract, NFTcontractAbi, signer);
+      // // let owner = await contract.ownerOf(nft.token_id);
+      if (owner == marketPlace) {
+        await marketOwnerCheck(account);
+      } else {
+        setOwnerAddress(owner);
+        setWalletAddress(wallet_Address);
+      }
       // let setSellPrice = await contract()
-      setOwnerAddress(owner);
-      setWalletAddress(wallet_Address);
+
       // console.log("owner", ownerAddress);
       // console.log("wallet", walletAddress);
       // console.log({ ownerAddress, walletAddress }, "*****************");
       // if (ownerAddress == walletAddress) {
       //   setMatch(!ownerMatch);
       // }
-      if (owner === wallet_Address) {
+      if (owner === account) {
         setMatch(true);
+        setPrice("");
       }
       console.log(ownerMatch);
     } catch (error) {
@@ -111,18 +148,32 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       let wallet_Address = ethers.utils.getAddress(account);
 
       let contract = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
-      let owner = await contract.ownerOf(NFTContract, nft.token_id);
+      let item = await contract.tokenItemId(nft.address, nft.token_id);
+      let owner = await contract.ownerOf(item);
+
+      let detail = await contract.getListedNFT(item);
+      console.log("dededede", detail, owner);
+
       // let setSellPrice = await contract()
       setMarketOwnerAddress(owner);
-      // console.log("owner", ownerAddress);
-      // console.log("wallet", walletAddress);
+      setPrice(ethers.utils.formatEther(detail[0][5].toString()));
+      console.log(
+        "sadsadasdasdasdasdas",
+        ethers.utils.formatEther(detail[0][5].toString())
+      );
       // console.log({ ownerAddress, walletAddress }, "*****************");
       // if (ownerAddress == walletAddress) {
       //   setMatch(!ownerMatch);
       // }
-      // if (owner === wallet_Address) {
-      //   setMatch(true);
-      // }
+
+      if (owner === account) {
+        console.log("SAd", owner);
+        setMarketOwnerAddressMatch(true);
+        setOwnerAddress(account);
+      } else {
+        setOwnerAddress(account);
+      }
+      console.log(marketOwnerAddressMatch);
       console.log("market owner match", ownerMatch);
     } catch (error) {
       console.log("Error Occurred while checking owner", error);
@@ -160,29 +211,76 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   //   }
   // };
 
-  const createMarketItem = async () => {
+  const approval = async () => {
     try {
       let signer = await loadProvider();
-      let contract = new ethers.Contract(
-        // RareBazaar_addr,
-        // supareRareBazar,
-        marketPlace,
-        marketPlaceAbi,
-        signer
-      );
-      let sellNow = await contract.createMarketItem(
-        // nft.address,
-        NFTContract,
-        1,
-        // nft.token_id,
-        // CERC20_addr,
-        ERC20,
-        10000
-        // SuperMarketplace_addr,
-        // marketPlace,
-        // [walletAddress],
-        // [100]
-      );
+      let contract721 = new ethers.Contract(nft.address, IERC721, signer);
+      let contract1155 = new ethers.Contract(nft.address, IERC1155, signer);
+      if (nft.schema_name == "ERC721") {
+        let alloawance = await contract721.isApprovedForAll(
+          account,
+          marketPlace
+        );
+        if (!alloawance) {
+          let approve = await contract721.setApprovalForAll(marketPlace, true);
+          let tx = await approve.wait();
+          if (tx.confirmations > 0) {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      } else {
+        let alloawance = await contract1155.isApprovedForAll(
+          account,
+          marketPlace
+        );
+        if (!alloawance) {
+          let approve = await contract1155.setApprovalForAll(marketPlace, true);
+          let tx = await approve.wait();
+          if (tx.confirmations > 0) {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const createMarketItem = async () => {
+    try {
+      let approve = await approval();
+      if (approve) {
+        let signer = await loadProvider();
+        let contract = new ethers.Contract(
+          // RareBazaar_addr,
+          // supareRareBazar,
+          marketPlace,
+          marketPlaceAbi,
+          signer
+        );
+        let sellNow = await contract.createMarketItem(
+          // nft.address,
+          nft.address,
+          nft.token_id,
+
+          ethers.utils.parseEther(Inputprice.toString()),
+          false,
+          120,
+          10
+          // nft.token_id,
+          // CERC20_addr,
+          // ERC20,
+
+          // SuperMarketplace_addr,
+          // marketPlace,
+          // [walletAddress],
+          // [100]
+        );
+      }
     } catch (error) {
       console.log(error);
     }
@@ -199,22 +297,11 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
         signer
       );
       console.log("new account", signer);
-      let sellNow = await contract.transferNFT(
-        // nft.address,
-        NFTContract,
-        marketPlace,
-        account,
-        0,
-        10000
-        // nft.token_id,
-        // CERC20_addr,
-        // ERC20,
-
-        // SuperMarketplace_addr,
-        // marketPlace,
-        // [walletAddress],
-        // [100]
-      );
+      // let sellNow = await contract.transferNFT(
+      let item = await contract.tokenItemId(nft.address, nft.token_id);
+      let sellNow = await contract.createMarketSale(nft.address, item, {
+        value: ethers.utils.parseEther(price),
+      });
     } catch (error) {
       console.log(error);
     }
@@ -251,11 +338,11 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
 
   useEffect(() => {
     setNft(props.router.query);
-    if (account && nft.address) {
+    if (account) {
       // console.log({ ac: nft.address, account }, "***************");
       (async () => {
         await ownerCheck(account);
-        // await marketOwnerCheck(account);
+
         // await getPrice();
       })();
     }
@@ -331,7 +418,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                     </span>
                     <span className="inline-flex align-baseline items-baseline">
                       <p className="text-3xl font-semibold mx-1">
-                        {price != null ? price : null}
+                        {price !== "" ? price : null}
                       </p>
                       <p className="text-normal mx-1">ETH</p>
                       <p className="CurrentOfferUsdAmount-sc-14ezkrc-26 kjoxs">
@@ -340,12 +427,22 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                     </span>
                   </div>
                   <div className=" mt-3">
-                    {ownerMatch && price?.length > 0 ? (
+                    {ownerMatch && price != "" ? (
                       <button
                         disabled
                         className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
                       >
                         You Own this item
+                      </button>
+                    ) : marketOwnerAddressMatch ? (
+                      <button
+                        className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
+                        // onClick={setModalIsOpen(!modalIsOpen)}
+                        onClick={() => setModalFormOpen(true)}
+                        // onClick={setSellPrice}
+                        // onClick={setSellandGet}
+                      >
+                        You listed This Item
                       </button>
                     ) : ownerMatch ? (
                       <button
@@ -523,6 +620,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           close={() => setModalFormOpen(false)}
           address={nft}
           createMarketItemFunc={createMarketItem}
+          setSalePrice={setSalePrice}
         />
         {/* <Modal modalopen={modalIsOpen} /> */}
       </div>

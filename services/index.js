@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { marketPlace } from "../contract-abi/addresses";
 const createBackendServer = (baseURL) => {
   const opensea = axios.create({
     baseURL,
@@ -8,16 +8,30 @@ const createBackendServer = (baseURL) => {
   });
 
   const getProfileAssets = (
-    address = "0xC9B56Ad4050c1C3B0E434D6382F6B184a9FcEc7D",
+    account,
+    // asset_contract_addresses = "0x3fdc19e2ec0bfbc80ed227716faef783ef19000a",
     limit = 100,
     offset = 0,
     order_direction = "desc",
     include_orders = "false"
-  ) =>
-    opensea.get(
-      `assets?&owner=${address}&order_direction=${order_direction}&include_orders=${include_orders}&offset=${offset}&limit=${limit}`
+  ) => {
+    console.log("metamask account", account);
+    return opensea.get(
+      `assets?&owner=${account}&order_direction=${order_direction}&include_orders=${include_orders}&offset=${offset}&limit=${limit}`
       // `collections?&offset=${offset}&limit=${limit}`
     );
+  };
+
+  // const getProfileAssets = (
+  //   account,
+  //   asset_contract_addresses = "0x3fdc19e2ec0bfbc80ed227716faef783ef19000a"
+  // ) => {
+  //   console.log("metamask account", account);
+  //   return opensea.get(
+  //     `assets?&asset_contract_addresses=${asset_contract_addresses}&owner=${account}`
+  //     // `collections?&offset=${offset}&limit=${limit}`
+  //   );
+  // };
 
   const getNfts = (
     asset_contract_addresses = "0x3fdc19e2ec0bfbc80ed227716faef783ef19000a",

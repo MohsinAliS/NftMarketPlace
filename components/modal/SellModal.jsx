@@ -15,10 +15,20 @@ import {
   Row,
   Col,
 } from "reactstrap";
-const SellModal = ({ open, close, address, createMarketItemFunc }) => {
-  const [amount, setAmount] = useState("");
+const SellModal = ({
+  open,
+  close,
+  address,
+  createMarketItemFunc,
+  setSalePrice,
+}) => {
+  const [inputprice, setinPutSalePrice] = useState("");
+  const handleSale = () => {
+    setSalePrice(inputprice);
+    createMarketItemFunc();
+  };
   console.log("sellmodal", open);
-  console.log("address", address);
+  // console.log("price", price);
 
   return (
     <>
@@ -45,7 +55,7 @@ const SellModal = ({ open, close, address, createMarketItemFunc }) => {
                         <Input
                           placeholder="Amount"
                           type="text"
-                          onChange={(e) => setAmount(e.target.value)}
+                          onChange={(e) => setinPutSalePrice(e.target.value)}
                         ></Input>
                       </InputGroup>
                     </FormGroup>
@@ -68,7 +78,7 @@ const SellModal = ({ open, close, address, createMarketItemFunc }) => {
                         className=" my-4"
                         color="primary"
                         type="button"
-                        onClick={createMarketItemFunc}
+                        onClick={handleSale}
                       >
                         Sell Now
                       </Button>

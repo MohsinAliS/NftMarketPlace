@@ -1,11 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
-import { useRouter, } from "next/router";
+/* eslint no-use-before-define: 0 */ // --> OFF
+import { useRouter } from "next/router";
 
 import { Tab } from "@headlessui/react";
 import Link from "next/link";
 import { Fragment, FunctionComponent, useState } from "react";
 import styles from "../../styles/Home.module.css";
- 
+
 type NftItemProps = {
   item: any;
 };
@@ -26,7 +27,7 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
 
   const [cTab, setCTab] = useState(0);
   const today = new Date().toISOString().split("T")[0];
- const router = useRouter();
+  const router = useRouter();
   const routerdata = router.asPath;
   console.log(routerdata);
   const controlMenuHandler = (e) => {
@@ -47,7 +48,10 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
       <a onClick={() => setShowControlMenu(false)}>
         <div className="max-w-xs border-slate-100 border-2 mx-auto">
           <div className="flex-shrink-0 hover:cursor-pointer ">
-            <Link href={{ pathname: "/nft-item", query:item }}  as={`${routerdata}/nft-item/${item.token_id}`} >
+            <Link
+              href={{ pathname: "/nft-item", query: item }}
+              as={`${routerdata}/nft-item/${item.token_id}`}
+            >
               <img
                 className={`h-80 w-full object-cover`}
                 src={item?.coverImage}
@@ -116,7 +120,13 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                       className="rounded-2xl w-8 h-8 "
                     />
                   </div>
-                  <div className="align-middle text-sm">{item?.createdBy}</div>
+                  <div className="align-middle text-sm">
+                    {item.createdBy.split("").slice(0, 5).join("")}...
+                    {item.createdBy
+                      .split("")
+                      .slice(Math.max(item.createdBy.length - 4, 0))
+                      .join("")}
+                  </div>
                 </div>
               </div>
               <div>
@@ -129,7 +139,14 @@ const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
                       className="rounded-2xl w-8 h-8 "
                     />
                   </div>
-                  <div className="align-middle text-sm">{item?.createdBy}</div>
+                  <div className="align-middle text-sm">
+                    {" "}
+                    {item.ownBy.split("").slice(0, 5).join("")}...
+                    {item.ownBy
+                      .split("")
+                      .slice(Math.max(item.ownBy.length - 4, 0))
+                      .join("")}
+                  </div>
                 </div>
               </div>
             </div>

@@ -114,18 +114,22 @@ const Profile: NextPage = () => {
                         image_url,
                         name,
                         description,
-                        schema_name,
+
                         token_id,
+                        creator: { address: creatorAddress },
+                        owner: { address: ownerAddress },
                         asset_contract: { address },
+                        asset_contract: { schema_name },
                       } = collection;
                       const item = {
                         coverImage: image_url,
                         name,
-                        createdBy: "",
                         description,
                         schema_name,
                         address,
                         token_id,
+                        createdBy: creatorAddress,
+                        ownBy: ownerAddress,
                         // collected: true,
                         // isAuction: false,
                       };
