@@ -28,6 +28,8 @@ import { ERC20, marketPlace, NFTContract, Auctions } from "../../contract-abi/ad
 import { NftItemData as item } from "../../content/nft-item";
 import { withRouter } from "next/router";
 import SellModal from "../../components/modal/SellModal";
+import SellModal2 from "../../components/modal/SellModal2";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import Countdown from "react-countdown";
 
@@ -71,6 +73,8 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
 
   console.log("nft", nft);
   const [modalFormOpen, setModalFormOpen] = useState(false);
+  const [modalFormOpen2, setModalFormOpen2] = useState(false);
+
   console.log("modal", modalFormOpen);
   const { connector, library, account, chainId, activate, deactivate, active } =
     useWeb3React();
@@ -79,12 +83,17 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   const [ownerAddress, setOwnerAddress] = useState("");
   const [marketOwnerAddress, setMarketOwnerAddress] = useState("");
   const [AuctionTime, setAuctionTime] = useState(0);
-
+const [gethighestBidder,setHigestBidder] = useState("")
+const [gethighestBid,setHigestBid] = useState("")
+const [auctionStatus,setAuctionStatus] = useState(false)
   const [ownerMatch, setMatch] = useState(false);
   const [marketOwnerAddressMatch, setMarketOwnerAddressMatch] = useState(false);
   const [price, setPrice] = useState("");
   const [Inputprice, setInputPrice] = useState("");
+  const [isCompleted, setisCompleted] = useState("");
 
+
+  console.log("auctionStatus",isCompleted)
   const setSalePrice = (inputprice) => {
     setInputPrice(inputprice);
   };
@@ -113,31 +122,13 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
         console.log("sadkjasbgdjasgjkas", balance, balance.toString(), owner);
       }
 
-      // // console.log(
-      // //   {
-      // //     address: nft.address,
-      // //     auctionAbi,
-      // //     signer,
-      // //   },
-      // //   "************************(((((("
-      // // );
-
-      // // let contract = new ethers.Contract(NFTContract, NFTcontractAbi, signer);
-      // // let owner = await contract.ownerOf(nft.token_id);
       if (owner == marketPlace) {
         await marketOwnerCheck(account);
       } else {
         setOwnerAddress(owner);
         setWalletAddress(wallet_Address);
       }
-      // let setSellPrice = await contract()
-
-      // console.log("owner", ownerAddress);
-      // console.log("wallet", walletAddress);
-      // console.log({ ownerAddress, walletAddress }, "*****************");
-      // if (ownerAddress == walletAddress) {
-      //   setMatch(!ownerMatch);
-      // }
+  
       if (owner === account) {
         setMatch(true);
         setPrice("");
@@ -161,17 +152,13 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       let detail = await contract.getListedNFT(item);
       console.log("dededede", detail, owner);
 
-      // let setSellPrice = await contract()
       setMarketOwnerAddress(owner);
       setPrice(ethers.utils.formatEther(detail[0][5].toString()));
       console.log(
         "sadsadasdasdasdasdas",
         ethers.utils.formatEther(detail[0][5].toString())
       );
-      // console.log({ ownerAddress, walletAddress }, "*****************");
-      // if (ownerAddress == walletAddress) {
-      //   setMatch(!ownerMatch);
-      // }
+ 
 
       if (owner === account) {
         console.log("SAd", owner);
@@ -187,36 +174,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
     }
   };
 
-  const setSellandGet = async () => {
-    // await setSellPrice();
-    await createMarketItem();
-  };
 
-  // const setSellPrice = async () => {
-  //   try {
-  //     let signer = await loadProvider();
-  //     let contract = new ethers.Contract(
-  //       // RareBazaar_addr,
-  //       // supareRareBazar,
-  //       marketPlace,
-  //       marketPlaceAbi,
-  //       signer
-  //     );
-  //     let sellNow = await contract.setSalePrice(
-  //       nft.address,
-  //       nft.token_id,
-  //       // CERC20_addr,
-  //       ERC20,
-  //       10000
-  //       // SuperMarketplace_addr,
-  //       // marketPlace,
-  //       // [walletAddress],
-  //       // [100]
-  //     );
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const approval = async () => {
     try {
@@ -280,14 +238,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           true,
           259200,
           10
-          // nft.token_id,
-          // CERC20_addr,
-          // ERC20,
-
-          // SuperMarketplace_addr,
-          // marketPlace,
-          // [walletAddress],
-          // [100]
+         
         );
       }
     } catch (error) {
@@ -312,6 +263,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
             marketPlaceAbi,
             signer
           );
+
           let sellNow = await contract.createMarketItem(
             // nft.address,
             nft.address,
@@ -319,7 +271,6 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
             ethers.utils.parseEther(Inputprice),
             true,
             timeInSec,
-
             10
           );
           console.log(sellNow);
@@ -333,11 +284,66 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   const gettingAuction = async() => {
     try {
       let signer = await loadProvider();
+      let contract = new ethers.Contract(
+        marketPlace,
+        marketPlaceAbi,
+        signer
+      );
+      let item = await contract.tokenItemId(nft.address, nft.token_id); 
       let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
-      let lastItem = await Auc.getLastTime(nft.token_id)
+      let lastItem = await Auc.getLastTime(item.toString())
       let time = Number(lastItem.toString())
-      console.log("AUCTION",time)
+      console.log("IDDDD",item.toString())
       setAuctionTime(time)
+
+    }catch(err) {
+      console.log("Error", err)
+    }
+  }
+
+  const highestBidder = async() => {
+    try {
+      let signer = await loadProvider();
+      let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+      let bidder = await Auc.getHighestBidder(nft.token_id)
+      // let time = Number(lastItem.toString())
+      console.log("Bidder",bidder)
+      setHigestBidder(bidder)
+      // setAuctionTime(time)
+
+    }catch(err) {
+      console.log("Error", err)
+    }
+  }
+
+  const highestBid = async() => {
+    try {
+      let signer = await loadProvider();
+      let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+      let bid = await Auc.getHighestBid(nft.token_id)
+      // let time = Number(lastItem.toString())
+      console.log("Bidder",bid)
+      setHigestBid(ethers.utils.formatEther(bid))
+      // setAuctionTime(time)
+
+    }catch(err) {
+      console.log("Error", err)
+    }
+  }
+  const auctionTime = async() => {
+    try {
+      let signer = await loadProvider();
+      let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+      let contract = new ethers.Contract(
+        marketPlace,
+        marketPlaceAbi,
+        signer
+      );
+      let item = await contract.tokenItemId(nft.address, nft.token_id); 
+      let response = await Auc.canSell(item.toString())
+      console.log("RESSSS",response)
+      setAuctionStatus(response)
+
 
     }catch(err) {
       console.log("Error", err)
@@ -366,127 +372,23 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
     }
   };
 
-  // const getPrice = async () => {
-  //   let signer = await loadProvider();
-  //   let contract = new ethers.Contract(
-  //     // RareBazaar_addr,
-  //     marketPlace,
-  //     // supareRareBazar,
-  //     marketPlaceAbi,
-  //     signer
-  //   );
-  //   try {
-  //     let getPrice = await contract.getSalePrice(
-  //       nft.address,
-  //       nft.token_id,
-  //       // SuperMarketplace_addr,
-  //       marketPlace
-  //     );
-  //     let price = await ethers.utils.formatUnits(getPrice[2]["_hex"], "gwei");
-  //     if (price == "0.0") {
-  //       await setPrice([]);
-  //     } else {
-  //       await setPrice(price);
-  //     }
-  //     console.log("setPrice values :", getPrice[2]["_hex"]);
-  //     console.log("After setPrice Get values :", getPrice);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
-
-  // let AuctionTime : number = 0
-// console.log(typeof AuctionTime)
-  const getTime = async() => {
-     let signer = await loadProvider();
-      let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
-      let lastItem = await Auc?.getLastTime(nft.token_id)
-      // console.log("TImee", Number(lastItem?.toString()))
-      console.log("last",lastItem)
-
-      //  setAuctionTime(lastItem.toString())
-     
-      // console.log("TImee",AuctionTime)
-     
-  }
-
+  console.log("AUCTION",AuctionTime)
  
-
-  // useEffect(() => {
-  //   const foo = async() => {
-  //     const target = new Date("10/1/2022 23:59:59").getTime();
-  //     // let signer = await loadProvider();
-  //     // let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
-  //     // let lastItem = await Auc.getLastTime(nft?.token_id)
-  //     // console.log("lastItem",lastItem?.toString())
-  //     // console.log("lastItem 3",Number(lastItem.toString()))
-  //     //  let time = Number(lastItem?.toString())
-  //     //  console.log("lastItem s3",time)
-     
-
-  //  const interval = setInterval( async() => {
-     
-  //    const now =Math.floor( new Date().getTime() / 1000);
-  //   //  console.log('Auction Time',time)
-    
-  //    if(target > now) {
-  //      difference =  target - now
-  //      console.log("difference",difference)
-      
-  //    } else {
-  //      console.log("Not ")
-  //    }
-  //    const d =Math.floor(difference / (1000 * 60 * 60 * 24));
-  //    setDays(d);
-
-  //    const h =Math.floor(
-  //      (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  //    );
-  //    setHours(h);
-
-  //    const m =Math.floor(difference % (1000 * 60 * 60)) / (1000 * 60);
-  //    setMinutes(m);
-
-  //    const s = Math.floor((difference % (1000 * 60)) / 1000);
-  //    setSeconds(s);
-
-  //    if (d <= 0 && h <= 0 && m <= 0 && s <= 0) {
-  //      setAuctionval(true);
-  //      setDays(0)
-  //      setHours(0)
-  //      setMinutes(0)
-  //      setSeconds(0)
-  //    }
-   
-    
-  
-  //  }, 2000);
-
-  //  if(Auctionval) {
-  //    clearInterval(interval)
-  //  }
-  
-
-  //   }
-     
-  //   foo()
-  // }, []);
   
   useEffect(() => {
     setNft(props.router.query);
     if (account) {
-      
-      // console.log({ ac: nft.address, account }, "***************");
+  
       (async () => {
         await ownerCheck(account);
-
-        // await getPrice();
       })();
   
     }
-    // getTime()
     gettingAuction()
+    highestBidder()
+    highestBid()
+    auctionTime()
   }, [account, nft.address]);
 
   const HistoryTab = () => {
@@ -499,9 +401,27 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   };
 
   const AuctionWatch = () => {
-  
+   setModalFormOpen2(true)
     console.log("Hello from Watch Function")
   }
+
+  const GetNFT =async () => {
+   try {
+    let signer = await loadProvider();
+    let Market = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
+    let item = await Market.tokenItemId(nft.address, nft.token_id);
+    let getItem = await Market.createMarketSale(
+      nft.address,
+      item.toString(),
+      {value: ethers.utils.parseEther("0")}
+    );
+    console.log("Suceess",getItem)
+
+   }catch(err) {
+    console.log("err",err)
+   }
+  }
+  
   return (
     <Fragment>
       <div className="max-w-lg mx-auto lg:grid gap-10 lg:grid-cols-12 lg:max-w-none mt-3">
@@ -520,16 +440,29 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
             </button>
           </div>
           <div className="lg:h-3/5">
-            <div className=" ">
+            <div className="">
               <h2 className="text-4xl mt-14">{nft.name}</h2>
              
               <div>
                 {
-                  AuctionTime > 0 ?  <Countdown date={AuctionTime * 1000} /> : ""
+                  AuctionTime > 0 ?  <Countdown date={AuctionTime * 1000}  /> : ""
                 }
                
                 </div>
-
+                <div>
+                 
+                { gethighestBidder != "0x0000000000000000000000000000000000000000" ?  `Highest Bidder:  ${gethighestBidder}` : ""
+                 
+                }
+               
+                </div>
+                <div>
+                 
+                 { gethighestBid > 0 ?  
+                   `Highest Bid:  ${gethighestBid} ETH` : "" 
+                 }
+                
+                 </div>
               
              
               <div className="grid gap-2 grid-cols-2 p-2">
@@ -616,9 +549,9 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                     ) : (
                       <button
                         className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
-                        onClick={AuctionTime > 0  ? AuctionWatch : BuyNft}
+                        onClick={auctionStatus == false ? AuctionWatch   : AuctionTime > 0 ? GetNFT  :  BuyNft}
                       >
-                       {AuctionTime > 0 ? "Place a Bid" : " Buy Nft"}
+                       {auctionStatus == false ?  "Place a Bid"  : "Get Nft" }
                       </button>
                     )}
                   </div>
@@ -628,34 +561,6 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
             </div>
           
           </div>
-
-          {/* {nft.isAuction && (
-            <div className="bg-gray-50 p-5">
-              <h6 className="text-lg">AUCTION ENDS IN</h6>
-              <div className="flex">
-                <div className="absolute mt-4">
-                  <img
-                    className="live-dot"
-                    src="data:image/gif;base64,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"
-                    alt="live auction dot"
-                  ></img>
-                </div>
-                <p className="ml-7 text-5xl font-medium">00:08:08:08</p>
-              </div>
-
-              <div className=" mt-5"> */}
-          {/* ownerMatch  */}
-          {/* {true && (
-                  <button className="w-full bg-black text-white py-2 px-10 rounded-full hover:shadow-xl hover:shadow-indigo-300 text-lg">
-                    Place a bid
-                  </button>
-                )}
-                <p className="mt-5">
-                  Once a bid is placed, it cannot be withdrawn.
-                </p>
-              </div>
-            </div>
-          )} */}
         </div>
       </div>
       <div>
@@ -787,6 +692,11 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           setSalePrice={setSalePrice}
           item={nft}
         />
+      <SellModal2
+         open={modalFormOpen2}
+         close={() => setModalFormOpen2(false)}
+         item={nft}
+      />
         {/* <Modal modalopen={modalIsOpen} /> */}
       </div>
     </Fragment>
