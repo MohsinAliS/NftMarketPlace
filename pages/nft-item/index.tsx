@@ -8,13 +8,13 @@ import { Contract, ethers } from "ethers";
 import type { NextPage } from "next";
 import { NftMeta } from "@_types/nft";
 import Web3Modal, { providers } from "web3modal";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
-import auctionAbi from "../../abi/NFTContract.json";
+// import auctionAbi from "../../abi/NFTContract.json";
 // import supareRareBazar from "../../abi/SuperRareBazaar.json";
 import marketPlaceAbi from "../../contract-abi/marketplace.json";
-import NFTcontractAbi from "../../contract-abi/NFTContract.json";
+import auctionAbi from "../../contract-abi/Auction.json";
 import IERC721 from "../../contract-abi/IERC721.json";
 import IERC1155 from "../../contract-abi/IERC1155.json";
 // import {
@@ -22,13 +22,14 @@ import IERC1155 from "../../contract-abi/IERC1155.json";
 //   SuperMarketplace_addr,
 //   RareBazaar_addr,
 // } from "../../abi/addresses";
-import { ERC20, marketPlace, NFTContract } from "../../contract-abi/addresses";
+import { ERC20, marketPlace, NFTContract, Auctions } from "../../contract-abi/addresses";
 
 // import {AuctionsBazaar_addr} from '../../abi/addresses'
 import { NftItemData as item } from "../../content/nft-item";
 import { withRouter } from "next/router";
 import SellModal from "../../components/modal/SellModal";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Countdown from "react-countdown";
 
 // import { nfts } from "content/meta";
 
@@ -69,10 +70,12 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   console.log("modal", modalFormOpen);
   const { connector, library, account, chainId, activate, deactivate, active } =
     useWeb3React();
-
+    const Ref = useRef(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [ownerAddress, setOwnerAddress] = useState("");
   const [marketOwnerAddress, setMarketOwnerAddress] = useState("");
+  const [AuctionTime, setAuctionTime] = useState(0);
+
   const [ownerMatch, setMatch] = useState(false);
   const [marketOwnerAddressMatch, setMarketOwnerAddressMatch] = useState(false);
   const [price, setPrice] = useState("");
@@ -268,8 +271,8 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           nft.token_id,
 
           ethers.utils.parseEther(Inputprice.toString()),
-          false,
-          120,
+          true,
+          259200,
           10
           // nft.token_id,
           // CERC20_addr,
@@ -285,6 +288,21 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       console.log(error);
     }
   };
+
+  const gettingAuction = async() => {
+    try {
+      let signer = await loadProvider();
+      let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+      let lastItem = await Auc.getLastTime(nft.token_id)
+      let time = Number(lastItem.toString())
+      console.log("AUCTION",time)
+      setAuctionTime(time)
+
+    }catch(err) {
+      console.log("Error", err)
+    }
+  }
+
 
   const BuyNft = async () => {
     try {
@@ -336,16 +354,98 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   //   }
   // };
 
+
+  // let AuctionTime : number = 0
+// console.log(typeof AuctionTime)
+  const getTime = async() => {
+     let signer = await loadProvider();
+      let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+      let lastItem = await Auc?.getLastTime(nft.token_id)
+      // console.log("TImee", Number(lastItem?.toString()))
+      console.log("last",lastItem)
+
+      //  setAuctionTime(lastItem.toString())
+     
+      // console.log("TImee",AuctionTime)
+     
+  }
+
+ 
+
+  // useEffect(() => {
+  //   const foo = async() => {
+  //     const target = new Date("10/1/2022 23:59:59").getTime();
+  //     // let signer = await loadProvider();
+  //     // let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+  //     // let lastItem = await Auc.getLastTime(nft?.token_id)
+  //     // console.log("lastItem",lastItem?.toString())
+  //     // console.log("lastItem 3",Number(lastItem.toString()))
+  //     //  let time = Number(lastItem?.toString())
+  //     //  console.log("lastItem s3",time)
+     
+
+  //  const interval = setInterval( async() => {
+     
+  //    const now =Math.floor( new Date().getTime() / 1000);
+  //   //  console.log('Auction Time',time)
+    
+  //    if(target > now) {
+  //      difference =  target - now
+  //      console.log("difference",difference)
+      
+  //    } else {
+  //      console.log("Not ")
+  //    }
+  //    const d =Math.floor(difference / (1000 * 60 * 60 * 24));
+  //    setDays(d);
+
+  //    const h =Math.floor(
+  //      (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+  //    );
+  //    setHours(h);
+
+  //    const m =Math.floor(difference % (1000 * 60 * 60)) / (1000 * 60);
+  //    setMinutes(m);
+
+  //    const s = Math.floor((difference % (1000 * 60)) / 1000);
+  //    setSeconds(s);
+
+  //    if (d <= 0 && h <= 0 && m <= 0 && s <= 0) {
+  //      setAuctionval(true);
+  //      setDays(0)
+  //      setHours(0)
+  //      setMinutes(0)
+  //      setSeconds(0)
+  //    }
+   
+    
+  
+  //  }, 2000);
+
+  //  if(Auctionval) {
+  //    clearInterval(interval)
+  //  }
+  
+
+  //   }
+     
+  //   foo()
+  // }, []);
+  
   useEffect(() => {
     setNft(props.router.query);
     if (account) {
+      
       // console.log({ ac: nft.address, account }, "***************");
       (async () => {
         await ownerCheck(account);
 
         // await getPrice();
       })();
+  
     }
+    // getTime()
+    gettingAuction()
   }, [account, nft.address]);
 
   const HistoryTab = () => {
@@ -356,6 +456,11 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
       </div>
     );
   };
+
+  const AuctionWatch = () => {
+  
+    console.log("Hello from Watch Function")
+  }
   return (
     <Fragment>
       <div className="max-w-lg mx-auto lg:grid gap-10 lg:grid-cols-12 lg:max-w-none mt-3">
@@ -376,6 +481,16 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
           <div className="lg:h-3/5">
             <div className=" ">
               <h2 className="text-4xl mt-14">{nft.name}</h2>
+             
+              <div>
+                {
+                  AuctionTime > 0 ?  <Countdown date={AuctionTime * 1000} /> : ""
+                }
+               
+                </div>
+
+              
+             
               <div className="grid gap-2 grid-cols-2 p-2">
                 <div>
                   <div className="flex space-x-2 mt-1">
@@ -390,6 +505,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                       <p className="text-gray-500 text-sm">Artist</p>
                       {item.creator.username}
                     </div>
+                   
                   </div>
                 </div>
                 <div>
@@ -426,6 +542,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                       </p>
                     </span>
                   </div>
+                
                   <div className=" mt-3">
                     {ownerMatch && price != "" ? (
                       <button
@@ -457,9 +574,9 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
                     ) : (
                       <button
                         className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
-                        onClick={BuyNft}
+                        onClick={AuctionTime > 0  ? AuctionWatch : BuyNft}
                       >
-                        Buy Nft
+                       {AuctionTime > 0 ? "Place a Bid" : " Buy Nft"}
                       </button>
                     )}
                   </div>
@@ -467,6 +584,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
               </div>
               {/* )} */}
             </div>
+          
           </div>
 
           {/* {nft.isAuction && (
@@ -525,6 +643,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
             <div className=" font-grotesk text-lg"> {nft.description}</div>
           </section>
         </div>
+       
         <section className="">
           <section className="mt-12">
             <h2 className="mt-12 mb-1.5 uppercase">Tags</h2>
