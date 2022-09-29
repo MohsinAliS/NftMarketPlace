@@ -3,8 +3,10 @@ import React, { Fragment, useState } from "react";
 import { Tab } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { Auctions } from "contract-abi/addresses";
+import { Auctions, marketPlace } from "contract-abi/addresses";
 import auctionAbi from "../../contract-abi/Auction.json";
+import marketPlaceAbi from "../../contract-abi/marketplace.json";
+
 // reactstrap components
 import {
   Button,
@@ -36,7 +38,13 @@ const SellModal2 = ({
  try{
   let signer = await loadProvider();
   let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
-  let bid = await Auc.bid(item.token_id,  {value: ethers.utils.parseEther(value)})
+  let contract = new ethers.Contract(
+    marketPlace,
+    marketPlaceAbi,
+    signer
+  );
+  let items = await contract.tokenItemId(item.address, item.token_id);
+  let bid = await Auc.bid(items.toString(),  {value: ethers.utils.parseEther(value)})
   console.log("BID",bid)
   setValue("")
  }catch(err) {

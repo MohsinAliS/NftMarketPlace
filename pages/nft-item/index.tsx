@@ -305,7 +305,13 @@ const [auctionStatus,setAuctionStatus] = useState(false)
     try {
       let signer = await loadProvider();
       let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
-      let bidder = await Auc.getHighestBidder(nft.token_id)
+      let contract = new ethers.Contract(
+        marketPlace,
+        marketPlaceAbi,
+        signer
+      );
+      let item = await contract.tokenItemId(nft.address, nft.token_id); 
+      let bidder = await Auc.getHighestBidder(item.toString())
       // let time = Number(lastItem.toString())
       console.log("Bidder",bidder)
       setHigestBidder(bidder)
@@ -320,11 +326,15 @@ const [auctionStatus,setAuctionStatus] = useState(false)
     try {
       let signer = await loadProvider();
       let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
-      let bid = await Auc.getHighestBid(nft.token_id)
-      // let time = Number(lastItem.toString())
+      let contract = new ethers.Contract(
+        marketPlace,
+        marketPlaceAbi,
+        signer
+      );
+      let item = await contract.tokenItemId(nft.address, nft.token_id); 
+      let bid = await Auc.getHighestBid(item.toString())
       console.log("Bidder",bid)
       setHigestBid(ethers.utils.formatEther(bid))
-      // setAuctionTime(time)
 
     }catch(err) {
       console.log("Error", err)
