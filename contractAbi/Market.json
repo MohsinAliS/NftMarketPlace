@@ -12,6 +12,7 @@
   "function getListedNFT(uint256) view returns (tuple(uint256,address,uint256,address,address,uint256,bool,bool,uint256)[])",
   "function getNftType(address) view returns (uint256)",
   "function isRoyalty(address) view returns (bool)",
+  "function margin() view returns (uint256)",
   "function owner() view returns (address)",
   "function ownerOf(uint256) view returns (address)",
   "function renounceOwnership()",
