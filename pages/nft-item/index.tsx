@@ -11,6 +11,7 @@ import Web3Modal, { providers } from "web3modal";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { FunctionComponent } from "react";
 
+
 // import auctionAbi from "../../abi/NFTContract.json";
 // import supareRareBazar from "../../abi/SuperRareBazaar.json";
 import marketPlaceAbi from "../../contract-abi/marketplace.json";
@@ -22,7 +23,7 @@ import IERC1155 from "../../contract-abi/IERC1155.json";
 //   SuperMarketplace_addr,
 //   RareBazaar_addr,
 // } from "../../abi/addresses";
-import { ERC20, marketPlace, NFTContract, Auctions } from "../../contract-abi/addresses";
+import {  marketPlace, NFTContract, Auctions } from "../../contract-abi/addresses";
 
 // import {AuctionsBazaar_addr} from '../../abi/addresses'
 import { NftItemData as item } from "../../content/nft-item";
@@ -71,7 +72,7 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
     owner_img: "",
   });
 
-  console.log("nft", nft);
+  console.log("nftcdfsd", nft.isAuction);
   const [modalFormOpen, setModalFormOpen] = useState(false);
   const [modalFormOpen2, setModalFormOpen2] = useState(false);
 
@@ -84,16 +85,14 @@ const NftItem: FunctionComponent<propTypes> = (props) => {
   const [marketOwnerAddress, setMarketOwnerAddress] = useState("");
   const [AuctionTime, setAuctionTime] = useState(0);
 const [gethighestBidder,setHigestBidder] = useState("")
-const [gethighestBid,setHigestBid] = useState("")
+const [gethighestBid,setHigestBid] = useState<any>("")
 const [auctionStatus,setAuctionStatus] = useState(false)
   const [ownerMatch, setMatch] = useState(false);
   const [marketOwnerAddressMatch, setMarketOwnerAddressMatch] = useState(false);
   const [price, setPrice] = useState("");
   const [Inputprice, setInputPrice] = useState("");
-  const [isCompleted, setisCompleted] = useState("");
+  const [check,setCheck] = useState(false)
 
-
-  console.log("auctionStatus",isCompleted)
   const setSalePrice = (inputprice) => {
     setInputPrice(inputprice);
   };
@@ -150,7 +149,7 @@ const [auctionStatus,setAuctionStatus] = useState(false)
       let owner = await contract.ownerOf(item);
 
       let detail = await contract.getListedNFT(item);
-      console.log("dededede", detail, owner);
+      console.log("dededede", detail[0][3], owner);
 
       setMarketOwnerAddress(owner);
       setPrice(ethers.utils.formatEther(detail[0][5].toString()));
@@ -231,12 +230,11 @@ const [auctionStatus,setAuctionStatus] = useState(false)
           signer
         );
         let sellNow = await contract.createMarketItem(
-          // nft.address,
           nft.address,
           nft.token_id,
           ethers.utils.parseEther(Inputprice.toString()),
-          true,
-          259200,
+          false,
+          0,
           10
          
         );
@@ -281,6 +279,7 @@ const [auctionStatus,setAuctionStatus] = useState(false)
     }
   };
 
+
   const gettingAuction = async() => {
     try {
       let signer = await loadProvider();
@@ -293,7 +292,7 @@ const [auctionStatus,setAuctionStatus] = useState(false)
       let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
       let lastItem = await Auc.getLastTime(item.toString())
       let time = Number(lastItem.toString())
-      console.log("IDDDD",item.toString())
+
       setAuctionTime(time)
 
     }catch(err) {
@@ -312,10 +311,8 @@ const [auctionStatus,setAuctionStatus] = useState(false)
       );
       let item = await contract.tokenItemId(nft.address, nft.token_id); 
       let bidder = await Auc.getHighestBidder(item.toString())
-      // let time = Number(lastItem.toString())
-      console.log("Bidder",bidder)
+      console.log("BID",bidder.toString())
       setHigestBidder(bidder)
-      // setAuctionTime(time)
 
     }catch(err) {
       console.log("Error", err)
@@ -333,8 +330,9 @@ const [auctionStatus,setAuctionStatus] = useState(false)
       );
       let item = await contract.tokenItemId(nft.address, nft.token_id); 
       let bid = await Auc.getHighestBid(item.toString())
-      console.log("Bidder",bid)
+       console.log("bid",item.toString())
       setHigestBid(ethers.utils.formatEther(bid))
+      
 
     }catch(err) {
       console.log("Error", err)
@@ -377,14 +375,33 @@ const [auctionStatus,setAuctionStatus] = useState(false)
       let sellNow = await contract.createMarketSale(nft.address, item, {
         value: ethers.utils.parseEther(price),
       });
+      setPrice("")
     } catch (error) {
       console.log(error);
     }
   };
 
 
-  console.log("AUCTION",AuctionTime)
- 
+  const checkingAuction = async() => {
+    try{
+      let signer = await loadProvider();
+      // let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+      let contract = new ethers.Contract(
+        marketPlace,
+        marketPlaceAbi,
+        signer
+      );
+      let item = await contract.tokenItemId(nft.address, nft.token_id); 
+      let response = await contract.getListedNFT(item.toString())
+     
+      setCheck(response[0][7])  
+      console.log("CHECK",response[0][7])
+    }catch(err) {
+      console.log(err)
+    }
+  
+  }
+
   
   useEffect(() => {
     setNft(props.router.query);
@@ -392,14 +409,23 @@ const [auctionStatus,setAuctionStatus] = useState(false)
   
       (async () => {
         await ownerCheck(account);
+        await checkingAuction();
+        await highestBidder();
+        await highestBid();
+     
+        
       })();
   
     }
     gettingAuction()
-    highestBidder()
-    highestBid()
+  
+   
     auctionTime()
+   
+    //  checkingAuction()
   }, [account, nft.address]);
+
+
 
   const HistoryTab = () => {
     return (
@@ -426,12 +452,27 @@ const [auctionStatus,setAuctionStatus] = useState(false)
       {value: ethers.utils.parseEther("0")}
     );
     console.log("Suceess",getItem)
-
+    setPrice("")
    }catch(err) {
     console.log("err",err)
    }
   }
   
+
+  const cancel = async() => {
+    try {
+      let signer = await loadProvider();
+      let Market = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
+      let item = await Market.tokenItemId(nft.address, nft.token_id);
+      let cancelItem = await Market.cancelListed(
+        item.toString()
+      );
+      console.log("Suceess",cancelItem)
+      setPrice("")
+     }catch(err) {
+      console.log("err",err)
+     }
+  }
   return (
     <Fragment>
       <div className="max-w-lg mx-auto lg:grid gap-10 lg:grid-cols-12 lg:max-w-none mt-3">
@@ -455,23 +496,34 @@ const [auctionStatus,setAuctionStatus] = useState(false)
              
               <div>
                 {
-                  AuctionTime > 0 ?  <Countdown date={AuctionTime * 1000}  /> : ""
+                  AuctionTime > 0 && auctionStatus == false ?  <Countdown date={AuctionTime * 1000}  /> : ""
                 }
                
                 </div>
                 <div>
                  
-                { gethighestBidder != "0x0000000000000000000000000000000000000000" ?  `Highest Bidder:  ${gethighestBidder}` : ""
+                { gethighestBidder != "0x0000000000000000000000000000000000000000" && auctionStatus == false ?  `Highest Bidder:  ${gethighestBidder}` : ""
                  
                 }
                
                 </div>
+              
                 <div>
                  
-                 { gethighestBid > 0 ?  
+                 { gethighestBid > 0  && auctionStatus == false ?  
                    `Highest Bid:  ${gethighestBid} ETH` : "" 
                  }
                 
+                 </div>
+                 <div>
+                  {
+                   !ownerMatch && auctionStatus == true ? `Highest Bidder:  ${gethighestBidder}` : ""
+                  }
+                 </div>
+                 <div>
+                  {
+                    !ownerMatch && auctionStatus == true ? `Highest Bid:  ${gethighestBid}` : ""
+                  }
                  </div>
               
              
@@ -518,7 +570,8 @@ const [auctionStatus,setAuctionStatus] = useState(false)
                     </span>
                     <span className="inline-flex align-baseline items-baseline">
                       <p className="text-3xl font-semibold mx-1">
-                        {price !== "" ? price : null}
+                        {!ownerMatch && gethighestBid > price ? gethighestBid : price}
+                      
                       </p>
                       <p className="text-normal mx-1">ETH</p>
                       <p className="CurrentOfferUsdAmount-sc-14ezkrc-26 kjoxs">
@@ -542,8 +595,9 @@ const [auctionStatus,setAuctionStatus] = useState(false)
                         // onClick={() => setModalFormOpen(true)}
                         // onClick={setSellPrice}
                         // onClick={setSellandGet}
+                        onClick={auctionStatus == false && gethighestBidder == "0x0000000000000000000000000000000000000000" ?  cancel : ()=> console.log("Hello")}
                       >
-                        You listed This Item
+                      {auctionStatus == false  && gethighestBidder == "0x0000000000000000000000000000000000000000" ?  "Cancel Listing" : "You Listed this item"}
                       </button>
                     ) : ownerMatch ? (
                       <button
@@ -559,11 +613,12 @@ const [auctionStatus,setAuctionStatus] = useState(false)
                     ) : (
                       <button
                         className="w-full bg-black text-white py-2 px-10 rounded-full font-semibold hover:shadow-xl hover:shadow-indigo-300"
-                        onClick={auctionStatus == false ? AuctionWatch   : AuctionTime > 0 ? GetNFT  :  BuyNft}
+                        onClick={ check == true && auctionStatus == false ? AuctionWatch  :gethighestBidder == account && auctionStatus == true ? GetNFT : check == false ?  BuyNft : ()=>console.log("Hello!") }
                       >
-                       {auctionStatus == false ?  "Place a Bid"  : "Get Nft" }
+                       {check == true && auctionStatus == false ?  "Place a Bid"  : gethighestBidder == account && auctionStatus == true ?   "Get NFT" : check == false ?   "Buy NFT" : "Auction has ended!" }
                       </button>
                     )}
+                   
                   </div>
                 </div>
               </div>

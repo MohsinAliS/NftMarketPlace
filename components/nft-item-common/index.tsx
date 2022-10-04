@@ -4,9 +4,15 @@ import { useRouter } from "next/router";
 
 import { Tab } from "@headlessui/react";
 import Link from "next/link";
-import { Fragment, FunctionComponent, useState } from "react";
+import { Fragment, FunctionComponent, useEffect, useState } from "react";
 import styles from "../../styles/Home.module.css";
-
+import loadProvider from "utils/loadProvider";
+import { marketPlace } from "contract-abi/addresses";
+import marketPlaceAbi from "../../contract-abi/marketplace.json";
+import { ethers } from "ethers";
+import IERC721 from "../../contract-abi/IERC721.json";
+import IERC1155 from "../../contract-abi/IERC1155.json";
+import { useWeb3React } from "@web3-react/core";
 type NftItemProps = {
   item: any;
 };
@@ -31,18 +37,130 @@ const NftItem: FunctionComponent<NftItemProps> = ({
   const [showControlMenu, setShowControlMenu] = useState(false);
   const [showStartAuction, setShowStartAuction] = useState(false);
   const [showSetListPrice, setShowSetListPrice] = useState(false);
-  // const [inputprice, setinPutSalePrice] = useState("");
-
+  const [walletAddress, setWalletAddress] = useState("");
+  const [marketOwnerAddress, setMarketOwnerAddress] = useState("");
+   const [price, setprice] = useState("");
+   const [ownerMatch, setMatch] = useState(false);
+   const [Price, setPrice] = useState("");
+   const [ownerAddress, setOwnerAddress] = useState("");
+   const [marketOwnerAddressMatch, setMarketOwnerAddressMatch] = useState(false);
   // const [cTab, setCTab] = useState(0);
   const today = new Date().toISOString().split("T")[0];
   const router = useRouter();
   const routerdata = router.asPath;
-  console.log(routerdata);
-
+  console.log("item",item);
+  const { connector, library, account, chainId, activate, deactivate, active } =
+    useWeb3React();
   const controlMenuHandler = (e) => {
     e.stopPropagation();
     setShowControlMenu(!showControlMenu);
   };
+  
+  const ownerCheck = async (account) => {
+    try {
+      let signer = await loadProvider();
+      console.log("account", account);
+      let wallet_Address = ethers.utils.getAddress(account);
+      let owner = "";
+      console.log("sadkjasbgdjasgjkas     1", item.schema_name, "ss");
+      if (item?.schema_name == "ERC721") {
+        let contract721 = new ethers.Contract(item.address, IERC721, signer);
+        console.log("sadkjasbgdjasgjkas     2", owner);
+        owner = await contract721.ownerOf(item.token_id);
+        console.log("sadkjasbgdjasgjkas", owner);
+      } else {
+        let contract1155 = new ethers.Contract(item.address, IERC1155, signer);
+        let balance = await contract1155.balanceOf(item.address, item.token_id);
+        if (Number(balance.toString()) > 0) {
+          owner = account;
+        } else {
+          owner = account;
+        }
+
+        console.log("sadkjasbgdjasgjkas", balance, balance.toString(), owner);
+      }
+
+      if (owner == marketPlace) {
+        await marketOwnerCheck(account);
+      } else {
+        setOwnerAddress(owner);
+        setWalletAddress(wallet_Address);
+      }
+  
+      if (owner === account) {
+        setMatch(true);
+        setPrice("");
+      }
+      console.log(ownerMatch);
+    } catch (error) {
+      console.log("Error Occurred while checking owner", error);
+    }
+  };
+
+  const marketOwnerCheck = async (account) => {
+    try {
+      let signer = await loadProvider();
+      console.log("account", account);
+      let wallet_Address = ethers.utils.getAddress(account);
+
+      let contract = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
+      let Item = await contract.tokenItemId(item.address, item.token_id);
+      let owner = await contract.ownerOf(Item);
+
+      let detail = await contract.getListedNFT(Item);
+      console.log("dededede", detail[0][3], owner);
+
+      setMarketOwnerAddress(owner);
+      setPrice(ethers.utils.formatEther(detail[0][5].toString()));
+      console.log(
+        "sadsadasdasdasdasdas",
+        ethers.utils.formatEther(detail[0][5].toString())
+      );
+ 
+
+      if (owner === account) {
+        console.log("SAd", owner);
+        setMarketOwnerAddressMatch(true);
+        setOwnerAddress(account);
+      } else {
+        setOwnerAddress(account);
+      }
+      console.log(marketOwnerAddressMatch);
+      console.log("market owner match", ownerMatch);
+    } catch (error) {
+      console.log("Error Occurred while checking owner", error);
+    }
+  };
+  // const priceOfItem = async() => {
+  //   try{
+  //     let signer = await loadProvider();
+  //     // let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+  //     let contract = new ethers.Contract(
+  //       marketPlace,
+  //       marketPlaceAbi,
+  //       signer
+  //     );
+  //      let temp = await contract.tokenItemId(item?.address, item?.token_id);
+  //     const res = await contract.getListedNFT(temp.toString())
+  //     console.log("THIS",res[0][5].toString())
+  //     setprice(ethers.utils.formatEther(res[0][5].toString()))
+  //   }catch(err){
+  //     console.log(err)
+  //   } 
+  
+  // }
+
+  useEffect(()=>{
+    if (account) {
+  
+      (async () => {
+        await ownerCheck(account);
+        
+      })();
+  
+    }
+    // priceOfItem()
+  },[])
 
   return (
     <Fragment>
@@ -105,8 +223,8 @@ const NftItem: FunctionComponent<NftItemProps> = ({
                     </div>
                   )}
                 </p>
-                <p className="text-gray-500 text-sm">List price</p>
-                <p className="">5.45 Eth</p>
+                <p className="text-gray-500 text-sm mt-2">List price</p>
+                <p className="mt-2 mb-2">{`${!ownerMatch ? Price : "0.0" } ETH`} </p>
               </div>
             </div>
             <hr />
@@ -142,10 +260,10 @@ const NftItem: FunctionComponent<NftItemProps> = ({
                   </div>
                   <div className="align-middle text-sm">
                     {" "}
-                    {item.ownBy.split("").slice(0, 5).join("")}...
-                    {item.ownBy
+                    {ownerAddress.split("").slice(0, 5).join("")}...
+                    {ownerAddress
                       .split("")
-                      .slice(Math.max(item.ownBy.length - 4, 0))
+                      .slice(Math.max(ownerAddress.length - 4, 0))
                       .join("")}
                   </div>
                 </div>

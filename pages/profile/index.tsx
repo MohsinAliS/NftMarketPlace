@@ -7,11 +7,16 @@ import { Fragment, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import apis from "../../services";
 import NftItem from "../../components/nft-item-common";
+import loadProvider from "utils/loadProvider";
+import { Auctions } from "contract-abi/addresses";
+import auctionAbi from "../../contract-abi/Auction.json";
+import { ethers } from "ethers";
 
 const Profile: NextPage = () => {
   const [cTab, setCTab] = useState(0);
   const [collections, setCollections] = useState([]);
   const [loader, setLoader] = useState(false);
+  const [amount,setAmount] = useState(0)
   const tabs = [
     { id: 0, title: "Collection(0)" },
     { id: 1, title: "Favorites (0)", disabled: true },
@@ -19,6 +24,27 @@ const Profile: NextPage = () => {
   ];
 
   const { account } = useWeb3React();
+  
+  const getPendingReturns = async () => {
+    let signer = await loadProvider();
+    let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+    let res = await Auc.getPendingReturns(account)
+    console.log("Rabeeb",res?.toString())
+    setAmount(res?.toString())
+
+  }
+
+  const proceeds = async() => {
+    try{
+      let signer = await loadProvider();
+      let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+      let res = await Auc.withdrawPendingBids(account)
+      console.log("This is the response of the function",res)
+    }catch(err) {
+      console.log("Error",err)
+    }
+
+  }
 
   useEffect(() => {
     if (account) {
@@ -28,10 +54,11 @@ const Profile: NextPage = () => {
           setLoader(true);
           const response = await apis.getProfileAssets(account); //account is parameter
           if (response.status === 200) {
-            // Console.log(response.data)
+            //console.log(response.data)
             setCollections(response.data.assets);
             console.log(response.data.assets);
             setLoader(false);
+          await  getPendingReturns()
           }
         } catch (e) {
           console.error("Error Occurred while fetching collections", e);
@@ -41,7 +68,8 @@ const Profile: NextPage = () => {
     }
   }, [account]);
 
-  console.log(collections);
+   
+
 
   return (
     <Fragment>
@@ -73,6 +101,9 @@ const Profile: NextPage = () => {
             </div>
             <button className="mt-3 hover:bg-black hover:text-white py-2 px-4 border border-gray-700 rounded-full w-full">
               Edit profile
+            </button>
+            <button className="mt-3 hover:bg-black hover:text-white py-2 px-4 border border-gray-700 rounded-full w-full" onClick={proceeds} disabled={amount <=0}>
+              Withdraw fail Bids
             </button>
           </div>
         </div>

@@ -22,7 +22,7 @@ const MarketPlace: NextPage = () => {
   ];
   const [assets, setAssets] = useState([]);
   const [loader, setLoader] = useState(false);
-
+  console.log("assets",assets)
   const { connector, library, account, chainId, activate, deactivate, active } =
     useWeb3React();
   const fetchMarket = async () => {
@@ -40,7 +40,7 @@ const MarketPlace: NextPage = () => {
     // let nftAddress = response[1][1];
     setAssets(response.data.assets);
     //  console.log(response.data.assets);
-    console.log("response", response);
+    console.log("Checing", response.data.assets);
   };
 
   // const getURI = async (nftAddress, type) => {
