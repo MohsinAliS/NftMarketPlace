@@ -48,7 +48,7 @@ const SellModal2 = ({
   console.log("BID",bid)
   setValue("")
  }catch(err) {
-  console.log("err",err)
+  console.log("ERROR OF FAILED BID",err)
  }
 
   }

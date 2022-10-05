@@ -441,18 +441,32 @@ const [auctionStatus,setAuctionStatus] = useState(false)
     console.log("Hello from Watch Function")
   }
 
+  const getPrice = async() => {
+    try {
+      let signer = await loadProvider();
+    // let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
+    let Market = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
+    let item = await Market.tokenItemId(nft.address, nft.token_id);
+      const res = await Market.priceThatHighestBidderWillPay(item.toString());
+      return res.toString();
+
+    }catch(err) {
+      console.log("Error",err);
+    }
+  }
+
+
   const GetNFT =async () => {
    try {
   
-     let premium = "0.10";
     let signer = await loadProvider();
-    let Auc = new ethers.Contract(Auctions, auctionAbi, signer);
     let Market = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
     let item = await Market.tokenItemId(nft.address, nft.token_id); 
-    let bid = await Auc.getHighestBid(item.toString())
-    //  realPrice = (bid.toString() * premium.toString());
-    console.log("OUT", ethers.utils.formatEther(((bid.toString() * premium).toString())))
-    const real = ethers.utils.formatEther(((bid.toString() * premium).toString()))
+   
+    let  realPrice = await getPrice();
+
+    const real = ethers.utils.formatEther(realPrice)
+
     let getItem = await Market.createMarketSale(
       nft.address,
       item.toString(),

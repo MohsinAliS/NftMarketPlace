@@ -56,81 +56,81 @@ const NftItem: FunctionComponent<NftItemProps> = ({
     setShowControlMenu(!showControlMenu);
   };
   
-  const ownerCheck = async (account) => {
-    try {
-      let signer = await loadProvider();
-      console.log("account", account);
-      let wallet_Address = ethers.utils.getAddress(account);
-      let owner = "";
-      console.log("sadkjasbgdjasgjkas     1", item.schema_name, "ss");
-      if (item?.schema_name == "ERC721") {
-        let contract721 = new ethers.Contract(item.address, IERC721, signer);
-        console.log("sadkjasbgdjasgjkas     2", owner);
-        owner = await contract721.ownerOf(item.token_id);
-        console.log("sadkjasbgdjasgjkas", owner);
-      } else {
-        let contract1155 = new ethers.Contract(item.address, IERC1155, signer);
-        let balance = await contract1155.balanceOf(item.address, item.token_id);
-        if (Number(balance.toString()) > 0) {
-          owner = account;
-        } else {
-          owner = account;
-        }
+  // const ownerCheck = async (account) => {
+  //   try {
+  //     let signer = await loadProvider();
+  //     console.log("account", account);
+  //     let wallet_Address = ethers.utils.getAddress(account);
+  //     let owner = "";
+  //     console.log("sadkjasbgdjasgjkas     1", item.schema_name, "ss");
+  //     if (item?.schema_name == "ERC721") {
+  //       let contract721 = new ethers.Contract(item.address, IERC721, signer);
+  //       console.log("sadkjasbgdjasgjkas     2", owner);
+  //       owner = await contract721.ownerOf(item.token_id);
+  //       console.log("sadkjasbgdjasgjkas", owner);
+  //     } else {
+  //       let contract1155 = new ethers.Contract(item.address, IERC1155, signer);
+  //       let balance = await contract1155.balanceOf(item.address, item.token_id);
+  //       if (Number(balance.toString()) > 0) {
+  //         owner = account;
+  //       } else {
+  //         owner = account;
+  //       }
 
-        console.log("sadkjasbgdjasgjkas", balance, balance.toString(), owner);
-      }
+  //       console.log("sadkjasbgdjasgjkas", balance, balance.toString(), owner);
+  //     }
 
-      if (owner == marketPlace) {
-        await marketOwnerCheck(account);
-      } else {
-        setOwnerAddress(owner);
-        setWalletAddress(wallet_Address);
-      }
+  //     if (owner == marketPlace) {
+  //       await marketOwnerCheck(account);
+  //     } else {
+  //       setOwnerAddress(owner);
+  //       setWalletAddress(wallet_Address);
+  //     }
   
-      if (owner === account) {
-        setMatch(true);
-        setPrice("");
-      }
-      console.log(ownerMatch);
-    } catch (error) {
-      console.log("Error Occurred while checking owner", error);
-    }
-  };
+  //     if (owner === account) {
+  //       setMatch(true);
+  //       setPrice("");
+  //     }
+  //     console.log(ownerMatch);
+  //   } catch (error) {
+  //     console.log("Error Occurred while checking owner", error);
+  //   }
+  // };
 
-  const marketOwnerCheck = async (account) => {
-    try {
-      let signer = await loadProvider();
-      console.log("account", account);
-      let wallet_Address = ethers.utils.getAddress(account);
+  // const marketOwnerCheck = async (account) => {
+  //   try {
+  //     let signer = await loadProvider();
+  //     console.log("account", account);
+  //     let wallet_Address = ethers.utils.getAddress(account);
 
-      let contract = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
-      let Item = await contract.tokenItemId(item.address, item.token_id);
-      let owner = await contract.ownerOf(Item);
+  //     let contract = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
+  //     let Item = await contract.tokenItemId(item.address, item.token_id);
+  //     let owner = await contract.ownerOf(Item);
 
-      let detail = await contract.getListedNFT(Item);
-      console.log("dededede", detail[0][3], owner);
+  //     let detail = await contract.getListedNFT(Item);
+  //     console.log("dededede", detail[0][3], owner);
 
-      setMarketOwnerAddress(owner);
-      setPrice(ethers.utils.formatEther(detail[0][5].toString()));
-      console.log(
-        "sadsadasdasdasdasdas",
-        ethers.utils.formatEther(detail[0][5].toString())
-      );
+  //     setMarketOwnerAddress(owner);
+  //     setPrice(ethers.utils.formatEther(detail[0][5].toString()));
+  //     console.log(
+  //       "sadsadasdasdasdasdas",
+  //       ethers.utils.formatEther(detail[0][5].toString())
+  //     );
  
 
-      if (owner === account) {
-        console.log("SAd", owner);
-        setMarketOwnerAddressMatch(true);
-        setOwnerAddress(account);
-      } else {
-        setOwnerAddress(account);
-      }
-      console.log(marketOwnerAddressMatch);
-      console.log("market owner match", ownerMatch);
-    } catch (error) {
-      console.log("Error Occurred while checking owner", error);
-    }
-  };
+  //     if (owner === account) {
+  //       console.log("SAd", owner);
+  //       setMarketOwnerAddressMatch(true);
+  //       setOwnerAddress(account);
+  //     } else {
+  //       setOwnerAddress(account);
+  //     }
+  //     console.log(marketOwnerAddressMatch);
+  //     console.log("market owner match", ownerMatch);
+  //   } catch (error) {
+  //     console.log("Error Occurred while checking owner", error);
+  //   }
+  // };
   // const priceOfItem = async() => {
   //   try{
   //     let signer = await loadProvider();
@@ -150,12 +150,28 @@ const NftItem: FunctionComponent<NftItemProps> = ({
   
   // }
 
+  const realOwner = async() => {
+    try{
+      let signer = await loadProvider();
+    
+
+      let contract = new ethers.Contract(marketPlace, marketPlaceAbi, signer);
+      let Item = await contract.tokenItemId(item.address, item.token_id);
+      const res = await contract.ownerOf(Item.toString())
+      setOwnerAddress(res)
+      console.log("RRRRRRRR",res)
+    }catch(err) {
+      console.log("err",err)
+    }
+
+  }
+
   useEffect(()=>{
     if (account) {
   
       (async () => {
-        await ownerCheck(account);
-        
+        // await ownerCheck(account);
+        await realOwner()
       })();
   
     }
